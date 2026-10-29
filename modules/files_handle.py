@@ -28,3 +28,19 @@ def load_messages(messages_directory:str) -> dict:
                     print(f"Error on reading file: {messages_file} - {e}")
 
     return msg_dict
+
+# Function to import style
+def import_style(filename:str, styles_directory:str) -> str:
+    # Add .txt if is not present in filename add it to filename string
+    if ".txt" not in filename: filename = f"{filename}.txt"
+
+    file_path = os.path.join(styles_directory, filename)
+
+    # Check if file exists, if not return an empty string
+    if not os.path.exists(file_path): return ""
+
+    # Load style
+    with open(file_path, "r") as f:
+        file_content = f.read().strip()
+
+    return file_content
