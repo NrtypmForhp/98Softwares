@@ -15,6 +15,8 @@ STYLES_DIRECTORY = os.path.join(APP_ROOT, "styles")
 MODULES_DIRECTORY = os.path.join(APP_ROOT, "modules")
 MESSAGES_DIRECTORY = os.path.join(APP_ROOT, "messages")
 PICTURES_DIRECTORY = os.path.join(APP_ROOT, "pictures")
+RESOURCES_DIRECTORY = os.path.join(APP_ROOT, "resources")
+FONTS_DIRECTORY = os.path.join(RESOURCES_DIRECTORY, "fonts")
 
 # Messages dict
 MSG = load_messages(MESSAGES_DIRECTORY)

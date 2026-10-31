@@ -49,5 +49,6 @@ class MainWindow(mm.BaseWindow):
 
         # Options button (right side)
         b_options = QPushButton(MSG["main_messages"]["options"])
+        b_options.setAccessibleName("b_yellow")
         b_options.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         top_frame_lay.addWidget(b_options)
