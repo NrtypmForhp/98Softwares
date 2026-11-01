@@ -5,3 +5,6 @@
 
 title: 98Softwares - Impostazioni
 language: Lingua
+database-connection-title: Connessione al database
+database-connection-description: Connessione ad un database (MongoDB). Lascia vuoto per usare un database locale creato automaticamente.
+database-connection-local-warning: ATTENZIONE!! Un database locale non ti permetterà la connessione di più dispositivi contemporaneamente!

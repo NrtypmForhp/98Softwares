@@ -5,7 +5,7 @@
 
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLabel, QPushButton
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap, QCursor
+from PySide6.QtGui import QPixmap
 import os
 
 # Base window import
@@ -54,7 +54,6 @@ class MainWindow(BaseWindow):
         # Settings button (right side)
         b_settings = QPushButton(session.get("msg")["main_messages"]["settings"])
         b_settings.setAccessibleName("b_yellow")
-        b_settings.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         b_settings.clicked.connect(self.settings_button)
         top_frame_lay.addWidget(b_settings)
 
