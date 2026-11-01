@@ -3,21 +3,32 @@
 # ---------------- MAIN MODULE -----------------
 # **********************************************
 
-from PySide6.QtWidgets import QWidget
-from modules.files_handle import import_style
+import os
 
 # Constants import
-from modules.constants import STYLES_DIRECTORY
+from modules.constants import DATABASE_DIRECTORY
 
-# Base window class (common settings for all windows)
-class BaseWindow(QWidget):
-    def __init__(self, title="98Softwares"):
-        super().__init__()
+# Session import
+from modules.session import session
 
-        self.setWindowTitle(title)
-        self.setMinimumSize(600, 400)
-        self.resize(1200, 800)
-        try:
-          self.setStyleSheet(import_style("dark", STYLES_DIRECTORY))
-        except Exception as e:
-          print(f"Impossible to load style: {e}")
+# Windows Manager import
+from modules.windows_manager import windows_manager
+from views.main import MainWindow
+from views.settings import SettingsWindow
+
+# Database and files import
+from modules.db import load_settings
+from modules.files_handle import load_messages
+
+# ** On start **
+def check_files_and_directories() -> None:
+    # Check if database directory exists
+    if not os.path.exists(DATABASE_DIRECTORY): os.mkdir(DATABASE_DIRECTORY)
+
+def set_session() -> None:
+    session.set("settings", load_settings())
+    session.set("msg", load_messages())
+
+def register_windows() -> None:
+    windows_manager.register_window("main_window", MainWindow)
+    windows_manager.register_window("settings_window", SettingsWindow)

@@ -7,7 +7,10 @@ from PySide6.QtGui import QFont, QFontDatabase
 import sys, os
 
 # Modules import
-from views.main import MainWindow
+import modules.main as mm
+
+# Windows Manager import
+from modules.windows_manager import windows_manager
 
 # Constants import
 from modules.constants import FONTS_DIRECTORY
@@ -30,6 +33,10 @@ if __name__ == "__main__":
     else:
         print("Warning! Error on loading custom font! Default font will be used.")
 
-    main_window = MainWindow()
-    main_window.show()
+    # Start check and session set
+    mm.check_files_and_directories()
+    mm.set_session()
+    mm.register_windows()
+
+    windows_manager.open_window("main_window")
     sys.exit(app.exec())

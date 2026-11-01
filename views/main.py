@@ -3,22 +3,26 @@
 # ----------------- MAIN VIEW ------------------
 # **********************************************
 
-from pydoc import text
-
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLabel, QPushButton
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QCursor
 import os
 
-# Modules import
-import modules.main as mm
+# Base window import
+from views.base_window import BaseWindow
+
+# Windows Manager import
+from modules.windows_manager import windows_manager
+
+# Session import
+from modules.session import session
 
 # Constants import
-from modules.constants import MSG, PICTURES_DIRECTORY
+from modules.constants import PICTURES_DIRECTORY
 
-class MainWindow(mm.BaseWindow):
+class MainWindow(BaseWindow):
     def __init__(self):
-        super().__init__(title=MSG["main_view"]["title"])
+        super().__init__(title=session.get("msg")["main_view"]["title"])
 
         # Set main layout
         self.lay = QVBoxLayout(self)
@@ -44,11 +48,16 @@ class MainWindow(mm.BaseWindow):
         l_logo.resize(picture_pixmap.width(), picture_pixmap.height())
         top_frame_lay.addWidget(l_logo)
 
-        # Center empty stretch to move the options button to right
+        # Center empty stretch to move the settings button to right
         top_frame_lay.addStretch()
 
-        # Options button (right side)
-        b_options = QPushButton(MSG["main_messages"]["options"])
-        b_options.setAccessibleName("b_yellow")
-        b_options.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        top_frame_lay.addWidget(b_options)
+        # Settings button (right side)
+        b_settings = QPushButton(session.get("msg")["main_messages"]["settings"])
+        b_settings.setAccessibleName("b_yellow")
+        b_settings.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        b_settings.clicked.connect(self.settings_button)
+        top_frame_lay.addWidget(b_settings)
+
+    # Settings button
+    def settings_button(self):
+        windows_manager.open_window("settings_window")

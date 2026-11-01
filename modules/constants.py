@@ -5,8 +5,6 @@
 
 import os
 
-from modules.files_handle import load_messages
-
 # Main directories
 CONSTANTS_PATH = os.path.abspath(__file__)
 CONSTANTS_DIRECTORY = os.path.dirname(CONSTANTS_PATH)
@@ -18,5 +16,5 @@ PICTURES_DIRECTORY = os.path.join(APP_ROOT, "pictures")
 RESOURCES_DIRECTORY = os.path.join(APP_ROOT, "resources")
 FONTS_DIRECTORY = os.path.join(RESOURCES_DIRECTORY, "fonts")
 
-# Messages dict
-MSG = load_messages(MESSAGES_DIRECTORY)
+# Database directory
+DATABASE_DIRECTORY = os.path.join(APP_ROOT, "database")

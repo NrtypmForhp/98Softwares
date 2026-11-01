@@ -1,6 +1,10 @@
+dnspython==2.9.1
+mongita==1.2.0
+pymongo==4.19.0
 PySide6==6.12.0
 PySide6_Addons==6.12.0
 PySide6_Essentials==6.12.0
 PySide6_Pdf==6.12.0.140
 PySide6_WebEngine==6.12.0.140
 shiboken6==6.12.0
+sortedcontainers==2.4.0
