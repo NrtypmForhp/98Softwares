@@ -6,14 +6,23 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QFont, QFontDatabase
 import sys, os
 
+# Session import
+from modules.session import session
+
 # Modules import
 import modules.main as mm
 
 # Windows Manager import
 from modules.windows_manager import windows_manager
+from views.main import MainWindow
+from views.settings import SettingsWindow
 
 # Constants import
-from modules.constants import FONTS_DIRECTORY
+from modules.constants import FONTS_DIRECTORY, DATABASE_DIRECTORY
+
+# Database and files import
+from modules.db import load_settings
+from modules.files_handle import load_messages
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -33,10 +42,16 @@ if __name__ == "__main__":
     else:
         print("Warning! Error on loading custom font! Default font will be used.")
 
-    # Start check and session set
-    mm.check_files_and_directories()
-    mm.set_session()
-    mm.register_windows()
+    # Check if database directory exists
+    if not os.path.exists(DATABASE_DIRECTORY): os.mkdir(DATABASE_DIRECTORY)
+
+    # Load session
+    session.set("settings", load_settings())
+    session.set("msg", load_messages())
+
+    # Start windows manager
+    windows_manager.register_window("main_window", MainWindow)
+    windows_manager.register_window("settings_window", SettingsWindow)
 
     windows_manager.open_window("main_window")
     sys.exit(app.exec())

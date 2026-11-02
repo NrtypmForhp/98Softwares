@@ -4,3 +4,4 @@
 # **********************************************
 
 settings: Impostazioni
+confirm: Conferma

@@ -3,7 +3,8 @@
 # ---------------- MAIN MODULE -----------------
 # **********************************************
 
-import os
+import subprocess
+from sys import platform
 
 # Constants import
 from modules.constants import DATABASE_DIRECTORY
@@ -13,22 +14,28 @@ from modules.session import session
 
 # Windows Manager import
 from modules.windows_manager import windows_manager
-from views.main import MainWindow
-from views.settings import SettingsWindow
 
-# Database and files import
-from modules.db import load_settings
-from modules.files_handle import load_messages
+# Get printer dict
+def get_printers_dict() -> dict:
+    printers_list = []
+    printers_dict = {}
 
-# ** On start **
-def check_files_and_directories() -> None:
-    # Check if database directory exists
-    if not os.path.exists(DATABASE_DIRECTORY): os.mkdir(DATABASE_DIRECTORY)
+    # Linux OS
+    if platform in ["linux", "linux2"]:
+        printers_list = subprocess.check_output(["lpstat", "-e"], encoding="utf-8")
+        printers_list = printers_list.split("\n")[:-1]
+        for printer in printers_list:
+            printers_dict[printer] = printer.upper()
 
-def set_session() -> None:
-    session.set("settings", load_settings())
-    session.set("msg", load_messages())
+    # Windows OS
+    if platform == "win32":
+        list_count = 0
+        printers = subprocess.check_output(["wmic", "printer", "get", "name"], encoding="utf-8")
+        for line in printers.splitlines():
+            line = line.strip()
+            if len(line) > 0 and list_count !=0: printers_list.append(line)
+            list_count += 1
+        for printer in printers_list:
+            printers_dict[printer] = printer.upper()
 
-def register_windows() -> None:
-    windows_manager.register_window("main_window", MainWindow)
-    windows_manager.register_window("settings_window", SettingsWindow)
+    return printers_dict
