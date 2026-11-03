@@ -5,3 +5,4 @@
 
 settings: Impostazioni
 confirm: Conferma
+cancel: Annulla

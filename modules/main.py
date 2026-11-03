@@ -6,15 +6,6 @@
 import subprocess
 from sys import platform
 
-# Constants import
-from modules.constants import DATABASE_DIRECTORY
-
-# Session import
-from modules.session import session
-
-# Windows Manager import
-from modules.windows_manager import windows_manager
-
 # Get printer dict
 def get_printers_dict() -> dict:
     printers_list = []

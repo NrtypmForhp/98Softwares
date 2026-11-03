@@ -4,6 +4,8 @@
 # **********************************************
 
 title: 98Softwares - Settings
+style: Style
+style-description: Application style. It will take effect only after restart!
 language: Language
 database-connection-title: Database connection
 database-connection-description: Connecting to a database (MongoDB). Leave blank to use an automatically created local database.
@@ -12,3 +14,4 @@ default-printer-title: Default printer
 default-printer-selection-description: Select default printer from list. Use only and exclusively thermal printers for receipts!
 default-printer-paper-width-description: Insert printer paper width in mm (usually can be 57 or 80).
 default-printer-paper-width-placeholder: Paper width in mm
+confirm-restart-warning: Application will restart when the CONFIRM button is pressed!

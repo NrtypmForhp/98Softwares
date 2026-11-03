@@ -50,4 +50,10 @@ class WindowsManager:
         if name in self._active_windows:
             del self._active_windows[name]
 
+    # Close all windows except the main window
+    def close_all_windows(self):
+        for name, window in list(self._active_windows.items()):
+            if name != "main_window":
+                window.close()
+
 windows_manager = WindowsManager()

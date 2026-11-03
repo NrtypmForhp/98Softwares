@@ -4,3 +4,5 @@
 # **********************************************
 
 title: 98Softwares - Main dashboard
+confirm-exit: Confirm exit
+confirm-exit-text: Do you really want to quit the application?

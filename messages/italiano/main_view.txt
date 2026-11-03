@@ -4,3 +4,5 @@
 # **********************************************
 
 title: 98Softwares - Dashboard principale
+confirm-exit: Conferma uscita
+confirm-exit-text: Vuoi davvero uscire dall'applicazione?

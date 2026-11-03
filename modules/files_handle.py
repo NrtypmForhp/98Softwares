@@ -12,9 +12,9 @@ from modules.session import session
 from modules.constants import MESSAGES_DIRECTORY
 
 # Function to load messages
-def load_messages() -> dict:
+def load_messages() -> None:
     # Check if messages directory is empty, in that case return an empty dict
-    if len(os.listdir(MESSAGES_DIRECTORY)) == 0: return {}
+    if len(os.listdir(MESSAGES_DIRECTORY)) == 0: return session.set("msg", {})
 
     # Load messages
     messages_language_directory = os.path.join(MESSAGES_DIRECTORY, session.get("settings")["language"])
@@ -34,7 +34,7 @@ def load_messages() -> dict:
                 except Exception as e:
                     print(f"Error on reading file: {messages_file} - {e}")
 
-    return msg_dict
+    session.set("msg", msg_dict)
 
 # Function to import style
 def import_style(filename:str, styles_directory:str) -> str:

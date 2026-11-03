@@ -7,6 +7,9 @@ from PySide6.QtWidgets import QWidget, QPushButton, QComboBox
 from PySide6.QtCore import Qt
 from modules.files_handle import import_style
 
+# Session import
+from modules.session import session
+
 # Constants import
 from modules.constants import STYLES_DIRECTORY
 
@@ -23,7 +26,7 @@ class BaseWindow(QWidget):
         self.resize(1200, 800)
 
         try:
-          self.setStyleSheet(import_style("dark", STYLES_DIRECTORY))
+          self.setStyleSheet(import_style(session.get("settings")["style"], STYLES_DIRECTORY))
         except Exception as e:
           print(f"Impossible to load style: {e}")
 

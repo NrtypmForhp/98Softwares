@@ -46,8 +46,8 @@ if __name__ == "__main__":
     if not os.path.exists(DATABASE_DIRECTORY): os.mkdir(DATABASE_DIRECTORY)
 
     # Load session
-    session.set("settings", load_settings())
-    session.set("msg", load_messages())
+    load_settings()
+    load_messages()
 
     # Start windows manager
     windows_manager.register_window("main_window", MainWindow)
