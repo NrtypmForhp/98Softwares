@@ -3,7 +3,7 @@
 # --------------- SETTINGS VIEW ----------------
 # **********************************************
 
-from PySide6.QtWidgets import QVBoxLayout, QPushButton, QComboBox, QLineEdit, QMessageBox, QApplication
+from PySide6.QtWidgets import QPushButton, QComboBox, QLineEdit, QMessageBox, QApplication, QCheckBox
 from PySide6.QtCore import Qt
 import os, sys
 from pymongo import MongoClient
@@ -30,10 +30,7 @@ class SettingsWindow(BaseWindow):
         super().__init__(title=session.get("msg")["settings"]["title"])
 
         # Set main layout
-        self.lay = QVBoxLayout(self)
-        self.setLayout(self.lay)
-        self.lay.setContentsMargins(10, 10, 10, 10)
-        self.lay.setSpacing(5)
+        self.lay = self.content_layout
 
         # Style
         self.l_style = WrappedLabel(text=session.get("msg")["settings"]["style"])
@@ -103,6 +100,11 @@ class SettingsWindow(BaseWindow):
         self.lay.addSpacing(20)
 
         # Default printer selection
+        self.printers_dict = get_printers_dict()
+        printers_list = []
+        for printer in self.printers_dict:
+            printers_list.append(self.printers_dict[printer])
+
         self.l_default_printer_title = WrappedLabel(text=session.get("msg")["settings"]["default-printer-title"])
         self.l_default_printer_title.setAccessibleName("l_title")
         self.l_default_printer_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -112,10 +114,6 @@ class SettingsWindow(BaseWindow):
         self.l_default_printer_selection_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lay.addWidget(self.l_default_printer_selection_description)
 
-        self.printers_dict = get_printers_dict()
-        printers_list = []
-        for printer in self.printers_dict:
-            printers_list.append(self.printers_dict[printer])
         self.cb_printers_list = QComboBox()
         self.cb_printers_list.addItem("") # First item blank
         self.cb_printers_list.addItems(printers_list)
@@ -129,10 +127,54 @@ class SettingsWindow(BaseWindow):
         self.lay.addWidget(self.l_default_printer_paper_width_description)
 
         self.le_default_printer_paper_width = QLineEdit()
-        if "default_printer_paper_width" in session.get("settings"):
+        if "default_printer_paper_width" in session.get("settings") and session.get("settings")["default_printer_paper_width"] != 0:
             self.le_default_printer_paper_width.setText(str(session.get("settings")["default_printer_paper_width"]))
         self.le_default_printer_paper_width.setPlaceholderText(session.get("msg")["settings"]["default-printer-paper-width-placeholder"])
         self.lay.addWidget(self.le_default_printer_paper_width, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        # Autocut
+        self.c_default_printer_autocut = QCheckBox()
+        if "default_printer_autocut" in session.get("settings") and session.get("settings")["default_printer_autocut"] == "yes":
+            self.c_default_printer_autocut.setChecked(True)
+        self.c_default_printer_autocut.setText(session.get("msg")["settings"]["default-printer-autocut-description"])
+        self.lay.addWidget(self.c_default_printer_autocut, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.lay.addSpacing(20)
+
+        # Default printer for orders
+        self.l_default_orders_printer_title = WrappedLabel(text=session.get("msg")["settings"]["default-printer-for-orders-title"])
+        self.l_default_orders_printer_title.setAccessibleName("l_title")
+        self.l_default_orders_printer_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(self.l_default_orders_printer_title)
+
+        self.l_default_orders_printer_selection_description = WrappedLabel(text=session.get("msg")["settings"]["default-printer-for-orders-selection-description"])
+        self.l_default_orders_printer_selection_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(self.l_default_orders_printer_selection_description)
+
+        self.cb_orders_printers_list = QComboBox()
+        self.cb_orders_printers_list.addItem("") # First item blank
+        self.cb_orders_printers_list.addItems(printers_list)
+        if "default_orders_printer" in session.get("settings") and session.get("settings")["default_orders_printer"] in printers_list:
+            self.cb_orders_printers_list.setCurrentText(session.get("settings")["default_orders_printer"])
+        self.lay.addWidget(self.cb_orders_printers_list, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        # Printer paper width
+        self.l_default_orders_printer_paper_width_description = WrappedLabel(text=session.get("msg")["settings"]["default-printer-paper-width-description"])
+        self.l_default_orders_printer_paper_width_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(self.l_default_orders_printer_paper_width_description)
+
+        self.le_default_orders_printer_paper_width = QLineEdit()
+        if "default_orders_printer_paper_width" in session.get("settings") and session.get("settings")["default_orders_printer_paper_width"] != 0:
+            self.le_default_orders_printer_paper_width.setText(str(session.get("settings")["default_orders_printer_paper_width"]))
+        self.le_default_orders_printer_paper_width.setPlaceholderText(session.get("msg")["settings"]["default-printer-paper-width-placeholder"])
+        self.lay.addWidget(self.le_default_orders_printer_paper_width, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        # Autocut
+        self.c_default_orders_printer_autocut = QCheckBox()
+        if "default_orders_printer_autocut" in session.get("settings") and session.get("settings")["default_orders_printer_autocut"] == "yes":
+            self.c_default_orders_printer_autocut.setChecked(True)
+        self.c_default_orders_printer_autocut.setText(session.get("msg")["settings"]["default-printer-autocut-description"])
+        self.lay.addWidget(self.c_default_orders_printer_autocut, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.lay.addSpacing(20)
 
@@ -168,6 +210,11 @@ class SettingsWindow(BaseWindow):
         self.l_default_printer_selection_description.setText(session.get("msg")["settings"]["default-printer-selection-description"])
         self.l_default_printer_paper_width_description.setText(session.get("msg")["settings"]["default-printer-paper-width-description"])
         self.le_default_printer_paper_width.setPlaceholderText(session.get("msg")["settings"]["default-printer-paper-width-placeholder"])
+        self.c_default_printer_autocut.setText(session.get("msg")["settings"]["default-printer-autocut-description"])
+        self.l_default_orders_printer_title.setText(session.get("msg")["settings"]["default-printer-for-orders-title"])
+        self.l_default_orders_printer_selection_description.setText(session.get("msg")["settings"]["default-printer-for-orders-selection-description"])
+        self.le_default_orders_printer_paper_width.setPlaceholderText(session.get("msg")["settings"]["default-printer-paper-width-placeholder"])
+        self.c_default_orders_printer_autocut.setText(session.get("msg")["settings"]["default-printer-autocut-description"])
         self.l_confirm_restart_warning.setText(session.get("msg")["settings"]["confirm-restart-warning"])
         self.b_confirm.setText(session.get("msg")["main_messages"]["confirm"])
 
@@ -179,6 +226,10 @@ class SettingsWindow(BaseWindow):
         db_connection = self.le_db_connection.text()
         default_printer = next((k for k, v in self.printers_dict.items() if v == self.cb_printers_list.currentText()), "")
         default_printer_paper_width = self.le_default_printer_paper_width.text()
+        default_printer_autocut = self.c_default_printer_autocut.isChecked()
+        default_orders_printer = next((k for k, v in self.printers_dict.items() if v == self.cb_orders_printers_list.currentText()), "")
+        default_orders_printer_paper_width = self.le_default_orders_printer_paper_width.text()
+        default_orders_printer_autocut = self.c_default_orders_printer_autocut.isChecked()
 
         # Check
         if db_connection != "":
@@ -193,30 +244,42 @@ class SettingsWindow(BaseWindow):
                 error_msg.setText(session.get("msg")["errors"]["db-connection-failed"])
                 return error_msg.exec()
 
-        if default_printer == "":
-            error_msg = QMessageBox(self)
-            error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
-            error_msg.setText(session.get("msg")["errors"]["mandatory-printer-select"])
-            return error_msg.exec()
+        numeric_default_printer_paper_width = 0
+        numeric_default_orders_printer_paper_width = 0
 
-        if default_printer_paper_width == "":
-            error_msg = QMessageBox(self)
-            error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
-            error_msg.setText(session.get("msg")["errors"]["printer-paper-width"])
-            return error_msg.exec()
+        if default_printer_paper_width != "":
+            try:
+                numeric_default_printer_paper_width = int(default_printer_paper_width)
+                if numeric_default_printer_paper_width < 1:
+                    error_msg = QMessageBox(self)
+                    error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
+                    error_msg.setText(session.get("msg")["errors"]["printer-paper-width"])
+                    return error_msg.exec()
+            except:
+                error_msg = QMessageBox(self)
+                error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
+                error_msg.setText(session.get("msg")["errors"]["printer-paper-width"])
+                return error_msg.exec()
 
-        try:
-            numeric_default_printer_paper_width = int(default_printer_paper_width)
-        except:
-            error_msg = QMessageBox(self)
-            error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
-            error_msg.setText(session.get("msg")["errors"]["printer-paper-width"])
-            return error_msg.exec()
+        if default_orders_printer_paper_width != "":
+            try:
+                numeric_default_orders_printer_paper_width = int(default_orders_printer_paper_width)
+                if numeric_default_orders_printer_paper_width < 1:
+                    error_msg = QMessageBox(self)
+                    error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
+                    error_msg.setText(session.get("msg")["errors"]["printer-paper-width"])
+                    return error_msg.exec()
+            except:
+                error_msg = QMessageBox(self)
+                error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
+                error_msg.setText(session.get("msg")["errors"]["printer-paper-width"])
+                return error_msg.exec()
 
         self.b_confirm.setEnabled(False)
 
         # Write settings to local database
-        write_settings(style, language, db_connection, default_printer, numeric_default_printer_paper_width)
+        write_settings(style, language, db_connection, default_printer, numeric_default_printer_paper_width, default_printer_autocut,
+                        default_orders_printer, numeric_default_orders_printer_paper_width, default_orders_printer_autocut)
 
         # Flag application to close programmatically
         app_instance = QApplication.instance()

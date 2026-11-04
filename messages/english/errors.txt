@@ -5,5 +5,4 @@
 
 error: Error
 db-connection-failed: Database connection failed! Please check the connection string.
-mandatory-printer-select: Selecting a printer is mandatory!
-printer-paper-width: Insert printer paper width in mm. Use only numbers in the field!
+printer-paper-width: Insert printer paper width in mm. Use only positive numbers in the field!

@@ -25,10 +25,7 @@ class MainWindow(BaseWindow):
         super().__init__(title=session.get("msg")["main_view"]["title"])
 
         # Set main layout
-        self.lay = QVBoxLayout(self)
-        self.setLayout(self.lay)
-        self.lay.setContentsMargins(10, 10, 10, 10)
-        self.lay.setSpacing(1)
+        self.lay = self.content_layout
 
         # ** Main frames with specific layout **
         top_frame = QFrame()

@@ -14,4 +14,7 @@ default-printer-title: Default printer
 default-printer-selection-description: Select default printer from list. Use only and exclusively thermal printers for receipts!
 default-printer-paper-width-description: Insert printer paper width in mm (usually can be 57 or 80).
 default-printer-paper-width-placeholder: Paper width in mm
+default-printer-autocut-description: Printer has autocut function
+default-printer-for-orders-title: Default orders printer
+default-printer-for-orders-selection-description: Select default printer for orders from list. Use only and exclusively thermal printers for receipts!
 confirm-restart-warning: Application will restart when the CONFIRM button is pressed!

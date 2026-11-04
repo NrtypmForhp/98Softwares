@@ -4,6 +4,26 @@ QWidget{
 QFrame{
     background: transparent;
 }
+QScrollBar{
+    border: none;
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+QScrollBar::handle{
+    background: rgba(10, 10, 10, 0.3);
+    min-height: 20px;
+    min-width: 20px;
+}
+QScrollBar:hover{
+    background: rgba(36, 36, 36, 0.05);
+}
+QScrollBar::handle:hover{
+    background: rgb(10, 10, 10);
+}
+QScrollBar::add-line, QScrollBar::sub-line{
+    height: 0px;
+}
 QLabel{
     color: rgb(10, 10, 10);
 }
@@ -102,4 +122,21 @@ QMessageBox QPushButton{
 }
 QMessageBox QPushButton:hover{
     border: 2px solid rgb(79, 79, 79);
+}
+QCheckBox{
+    padding: 5px;
+    background: transparent;
+    color: rgb(10, 10, 10);
+}
+QCheckBox::indicator{
+    border: 2px solid rgb(0, 0, 0);
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+}
+QCheckBox::indicator:checked{
+    background-color: rgb(10, 10, 10);
+}
+QCheckBox::indicator:unchecked{
+    background-color: transparent;
 }

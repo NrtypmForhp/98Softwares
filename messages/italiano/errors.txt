@@ -5,5 +5,4 @@
 
 error: Errore
 db-connection-failed: Connessione al database fallita! Controlla la stringa di connessione.
-mandatory-printer-select: Selezionare una stampante è obbligatorio!
-printer-paper-width: Inserisci la larghezza della carta della stampante. Usa solo numeri nel campo!
+printer-paper-width: Inserisci la larghezza della carta della stampante. Usa solo numeri positivi nel campo!
