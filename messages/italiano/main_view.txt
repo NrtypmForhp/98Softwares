@@ -6,3 +6,6 @@
 title: 98Softwares - Dashboard principale
 confirm-exit: Conferma uscita
 confirm-exit-text: Vuoi davvero uscire dall'applicazione?
+orders-description-title: Comande
+orders-description: Gestione e stampa scontrini e comande
+orders-description-tooltip-1: - Crea e modifica articoli

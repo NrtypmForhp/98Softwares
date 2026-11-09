@@ -3,7 +3,7 @@
 # ----------------- MAIN VIEW ------------------
 # **********************************************
 
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLabel, QPushButton, QMessageBox, QApplication
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLabel, QPushButton, QMessageBox, QApplication, QSizePolicy
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QCloseEvent
 import os
@@ -16,6 +16,9 @@ from modules.windows_manager import windows_manager
 
 # Session import
 from modules.session import session
+
+# Components import
+from views.components import ExpandedFrame, WrappedLabel, ProportionalImageLabel
 
 # Constants import
 from modules.constants import PICTURES_DIRECTORY
@@ -53,6 +56,48 @@ class MainWindow(BaseWindow):
         b_settings.setAccessibleName("b_main")
         b_settings.clicked.connect(self.settings_button)
         top_frame_lay.addWidget(b_settings)
+
+        # ** Bottom Frame **
+
+        # Orders
+        f_orders = ExpandedFrame()
+        f_orders.setAccessibleName("main_view_frame")
+        f_orders.setCursor(Qt.CursorShape.PointingHandCursor)
+        f_orders_lay = QHBoxLayout(f_orders)
+        bottom_frame_lay.addWidget(f_orders)
+
+        # Orders frame
+        picture_pixmap = QPixmap(os.path.join(PICTURES_DIRECTORY, "orders_main.png"))
+        l_orders_main_logo = ProportionalImageLabel(picture_pixmap)
+        f_orders_lay.addWidget(l_orders_main_logo)
+
+        f_orders_lay.addSpacing(20)
+
+        # Orders description
+        f_orders_description = ExpandedFrame()
+        f_orders_description_lay = QVBoxLayout(f_orders_description)
+        f_orders_lay.addWidget(f_orders_description)
+
+        l_orders_description_title = WrappedLabel(text=session.get("msg")["main_view"]["orders-description-title"])
+        l_orders_description_title.setAccessibleName("l_title")
+        l_orders_description_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_orders_description_lay.addWidget(l_orders_description_title)
+
+        f_orders_description_lay.addSpacing(5)
+
+        l_orders_description = WrappedLabel(text=session.get("msg")["main_view"]["orders-description"])
+        l_orders_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_orders_description_lay.addWidget(l_orders_description)
+
+        l_orders_description_tooltip_1 = WrappedLabel(text=session.get("msg")["main_view"]["orders-description-tooltip-1"])
+        l_orders_description_tooltip_1.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_orders_description_lay.addWidget(l_orders_description_tooltip_1)
+
+        f_orders_description_lay.addStretch() # Keep all widgets up
+
+        f_orders_lay.addStretch() # Keep all widgets left
+
+        bottom_frame_lay.addStretch() # Keep all widgets up
 
     # Settings button
     def settings_button(self):

@@ -4,6 +4,12 @@ QWidget{
 QFrame{
     background: transparent;
 }
+QFrame[accessibleName="main_view_frame"]{
+    min-height: 150px;
+}
+QFrame[accessibleName="main_view_frame"]:hover{
+    border: 2px solid rgb(79, 79, 79);
+}
 QScrollBar{
     border: none;
     background: transparent;

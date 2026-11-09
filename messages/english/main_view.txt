@@ -6,3 +6,6 @@
 title: 98Softwares - Main dashboard
 confirm-exit: Confirm exit
 confirm-exit-text: Do you really want to quit the application?
+orders-description-title: Orders
+orders-description: Management and printing of receipts and orders
+orders-description-tooltip-1: - Create and modify items
