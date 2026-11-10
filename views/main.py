@@ -59,24 +59,25 @@ class MainWindow(BaseWindow):
 
         # ** Bottom Frame **
 
-        # Orders
+        # ** Orders **
         f_orders = ExpandedFrame()
         f_orders.setAccessibleName("main_view_frame")
         f_orders.setCursor(Qt.CursorShape.PointingHandCursor)
+        f_orders.setFixedHeight(150)
         f_orders_lay = QHBoxLayout(f_orders)
         bottom_frame_lay.addWidget(f_orders)
 
         # Orders frame
         picture_pixmap = QPixmap(os.path.join(PICTURES_DIRECTORY, "orders_main.png"))
         l_orders_main_logo = ProportionalImageLabel(picture_pixmap)
-        f_orders_lay.addWidget(l_orders_main_logo)
+        f_orders_lay.addWidget(l_orders_main_logo, stretch=0)
 
         f_orders_lay.addSpacing(20)
 
         # Orders description
         f_orders_description = ExpandedFrame()
         f_orders_description_lay = QVBoxLayout(f_orders_description)
-        f_orders_lay.addWidget(f_orders_description)
+        f_orders_lay.addWidget(f_orders_description, stretch=1)
 
         l_orders_description_title = WrappedLabel(text=session.get("msg")["main_view"]["orders-description-title"])
         l_orders_description_title.setAccessibleName("l_title")
@@ -93,9 +94,134 @@ class MainWindow(BaseWindow):
         l_orders_description_tooltip_1.setAlignment(Qt.AlignmentFlag.AlignCenter)
         f_orders_description_lay.addWidget(l_orders_description_tooltip_1)
 
+        l_orders_description_tooltip_2 = WrappedLabel(text=session.get("msg")["main_view"]["orders-description-tooltip-2"])
+        l_orders_description_tooltip_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_orders_description_lay.addWidget(l_orders_description_tooltip_2)
+
         f_orders_description_lay.addStretch() # Keep all widgets up
 
-        f_orders_lay.addStretch() # Keep all widgets left
+        # ** Orders database **
+        f_orders_database = ExpandedFrame()
+        f_orders_database.setAccessibleName("main_view_frame")
+        f_orders_database.setCursor(Qt.CursorShape.PointingHandCursor)
+        f_orders_database.setFixedHeight(150)
+        f_orders_database_lay = QHBoxLayout(f_orders_database)
+        bottom_frame_lay.addWidget(f_orders_database)
+
+        # Orders database frame
+        picture_pixmap = QPixmap(os.path.join(PICTURES_DIRECTORY, "database_main.png"))
+        l_orders_database_main_logo = ProportionalImageLabel(picture_pixmap)
+        f_orders_database_lay.addWidget(l_orders_database_main_logo, stretch=0)
+
+        f_orders_database_lay.addSpacing(20)
+
+        # Orders database description
+        f_orders_database_description = ExpandedFrame()
+        f_orders_database_description_lay = QVBoxLayout(f_orders_database_description)
+        f_orders_database_lay.addWidget(f_orders_database_description, stretch=1)
+
+        l_orders_database_description_title = WrappedLabel(text=session.get("msg")["main_view"]["orders-database-description-title"])
+        l_orders_database_description_title.setAccessibleName("l_title")
+        l_orders_database_description_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_orders_database_description_lay.addWidget(l_orders_database_description_title)
+
+        f_orders_database_description_lay.addSpacing(5)
+
+        l_orders_database_description = WrappedLabel(text=session.get("msg")["main_view"]["orders-database-description"])
+        l_orders_database_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_orders_database_description_lay.addWidget(l_orders_database_description)
+
+        l_orders_database_description_tooltip_1 = WrappedLabel(text=session.get("msg")["main_view"]["orders-database-description-tooltip-1"])
+        l_orders_database_description_tooltip_1.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_orders_database_description_lay.addWidget(l_orders_database_description_tooltip_1)
+
+        l_orders_database_description_tooltip_2 = WrappedLabel(text=session.get("msg")["main_view"]["orders-database-description-tooltip-2"])
+        l_orders_database_description_tooltip_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_orders_database_description_lay.addWidget(l_orders_database_description_tooltip_2)
+
+        f_orders_database_description_lay.addStretch() # Keep all widgets up
+
+        # ** Memberships **
+        f_memberships = ExpandedFrame()
+        f_memberships.setAccessibleName("main_view_frame")
+        f_memberships.setCursor(Qt.CursorShape.PointingHandCursor)
+        f_memberships.setFixedHeight(150)
+        f_memberships_lay = QHBoxLayout(f_memberships)
+        bottom_frame_lay.addWidget(f_memberships)
+
+        # Memberships frame
+        picture_pixmap = QPixmap(os.path.join(PICTURES_DIRECTORY, "memberships_main.png"))
+        l_memberships_main_logo = ProportionalImageLabel(picture_pixmap)
+        f_memberships_lay.addWidget(l_memberships_main_logo, stretch=0)
+
+        f_memberships_lay.addSpacing(20)
+
+        # Memberships description
+        f_memberships_description = ExpandedFrame()
+        f_memberships_description_lay = QVBoxLayout(f_memberships_description)
+        f_memberships_lay.addWidget(f_memberships_description, stretch=1)
+
+        l_memberships_description_title = WrappedLabel(text=session.get("msg")["main_view"]["memberships-description-title"])
+        l_memberships_description_title.setAccessibleName("l_title")
+        l_memberships_description_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_memberships_description_lay.addWidget(l_memberships_description_title)
+
+        f_memberships_description_lay.addSpacing(5)
+
+        l_memberships_description = WrappedLabel(text=session.get("msg")["main_view"]["memberships-description"])
+        l_memberships_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_memberships_description_lay.addWidget(l_memberships_description)
+
+        l_memberships_description_tooltip_1 = WrappedLabel(text=session.get("msg")["main_view"]["memberships-description-tooltip-1"])
+        l_memberships_description_tooltip_1.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_memberships_description_lay.addWidget(l_memberships_description_tooltip_1)
+
+        l_memberships_description_tooltip_2 = WrappedLabel(text=session.get("msg")["main_view"]["memberships-description-tooltip-2"])
+        l_memberships_description_tooltip_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_memberships_description_lay.addWidget(l_memberships_description_tooltip_2)
+
+        f_memberships_description_lay.addStretch() # Keep all widgets up
+
+        # ** Memberships database **
+        f_memberships_database = ExpandedFrame()
+        f_memberships_database.setAccessibleName("main_view_frame")
+        f_memberships_database.setCursor(Qt.CursorShape.PointingHandCursor)
+        f_memberships_database.setFixedHeight(150)
+        f_memberships_database_lay = QHBoxLayout(f_memberships_database)
+        bottom_frame_lay.addWidget(f_memberships_database)
+
+        # Memberships database frame
+        picture_pixmap = QPixmap(os.path.join(PICTURES_DIRECTORY, "database_main.png"))
+        l_memberships_database_main_logo = ProportionalImageLabel(picture_pixmap)
+        f_memberships_database_lay.addWidget(l_memberships_database_main_logo, stretch=0)
+
+        f_memberships_database_lay.addSpacing(20)
+
+        # Memberships database description
+        f_memberships_database_description = ExpandedFrame()
+        f_memberships_database_description_lay = QVBoxLayout(f_memberships_database_description)
+        f_memberships_database_lay.addWidget(f_memberships_database_description, stretch=1)
+
+        l_memberships_database_description_title = WrappedLabel(text=session.get("msg")["main_view"]["memberships-database-description-title"])
+        l_memberships_database_description_title.setAccessibleName("l_title")
+        l_memberships_database_description_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_memberships_database_description_lay.addWidget(l_memberships_database_description_title)
+
+        f_memberships_database_description_lay.addSpacing(5)
+
+        l_memberships_database_description = WrappedLabel(text=session.get("msg")["main_view"]["memberships-database-description"])
+        l_memberships_database_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_memberships_database_description_lay.addWidget(l_memberships_database_description)
+
+        l_memberships_database_description_tooltip_1 = WrappedLabel(text=session.get("msg")["main_view"]["memberships-database-description-tooltip-1"])
+        l_memberships_database_description_tooltip_1.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_memberships_database_description_lay.addWidget(l_memberships_database_description_tooltip_1)
+
+        l_memberships_database_description_tooltip_2 = WrappedLabel(text=session.get("msg")["main_view"]["memberships-database-description-tooltip-2"])
+        l_memberships_database_description_tooltip_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        f_memberships_database_description_lay.addWidget(l_memberships_database_description_tooltip_2)
+
+        f_memberships_database_description_lay.addStretch() # Keep all widgets up
 
         bottom_frame_lay.addStretch() # Keep all widgets up
 

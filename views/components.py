@@ -4,7 +4,7 @@
 # **********************************************
 
 from PySide6.QtWidgets import QLabel, QSizePolicy, QLineEdit, QFrame
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSize
 
 class WrappedLabel(QLabel):
     def __init__(self, text="", parent=None):
@@ -35,7 +35,18 @@ class ProportionalImageLabel(QLabel):
         super().__init__(parent)
         self.original_pixmap = pixmap
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+
+    def sizeHint(self):
+        if self.original_pixmap.isNull():
+            return super().sizeHint()
+
+        # Calculate the proportional width based on the current height of the widget
+        current_height = self.height() if self.height() > 0 else 130
+        aspect_ratio = self.original_pixmap.width() / self.original_pixmap.height()
+        calculated_width = int(current_height * aspect_ratio)
+
+        return QSize(calculated_width, current_height)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

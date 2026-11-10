@@ -9,3 +9,16 @@ confirm-exit-text: Do you really want to quit the application?
 orders-description-title: Orders
 orders-description: Management and printing of receipts and orders
 orders-description-tooltip-1: - Create and modify items
+orders-description-tooltip-2: - Manage customers orders
+orders-database-description-title: Orders database
+orders-database-description: Orders database management
+orders-database-description-tooltip-1: - Check totals over a time frame
+orders-database-description-tooltip-2: - Delete or reprint receipts and orders
+memberships-description-title: Memberships
+memberships-description: Memberships management
+memberships-description-tooltip-1: - Add new members
+memberships-description-tooltip-2: - Check if the membership is still valid
+memberships-database-description-title: Memberships database
+memberships-database-description: Memberships database management
+memberships-database-description-tooltip-1: - Check all the members
+memberships-database-description-tooltip-2: - Delete and modify memberships

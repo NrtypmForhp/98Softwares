@@ -9,3 +9,16 @@ confirm-exit-text: Vuoi davvero uscire dall'applicazione?
 orders-description-title: Comande
 orders-description: Gestione e stampa scontrini e comande
 orders-description-tooltip-1: - Crea e modifica articoli
+orders-description-tooltip-2: - Gestisci gli ordini dei clienti
+orders-database-description-title: Database comande
+orders-database-description: Gestisci il database degli ordini
+orders-database-description-tooltip-1: - Controlla i totali in un lasso di tempo
+orders-database-description-tooltip-2: - Elimina o ristampa scontrini e comande
+memberships-description-title: Tesseramenti
+memberships-description: Gestione tesseramenti
+memberships-description-tooltip-1: - Aggiungi nuovi tesserati
+memberships-description-tooltip-2: - Controlla se il tesseramento è ancora valido
+memberships-database-description-title: Database tesseramenti
+memberships-database-description: Gestione del database tesseramenti
+memberships-database-description-tooltip-1: - Controlla tutti i tesserati
+memberships-database-description-tooltip-2: - Elimina e modifica i tesseramenti
