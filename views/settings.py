@@ -3,7 +3,7 @@
 # --------------- SETTINGS VIEW ----------------
 # **********************************************
 
-from PySide6.QtWidgets import QPushButton, QComboBox, QLineEdit, QMessageBox, QApplication, QCheckBox
+from PySide6.QtWidgets import QPushButton, QLineEdit, QMessageBox, QApplication, QCheckBox
 from PySide6.QtCore import Qt
 import os, sys
 from pymongo import MongoClient
@@ -13,7 +13,7 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 from views.base_window import BaseWindow
 
 # Components import
-from views.components import WrappedLabel, ExpandedLineEdit
+from views.components import WrappedLabel, ExpandedLineEdit, ExpandedTextEdit, NonScrollingComboBox
 
 # Session import
 from modules.session import session
@@ -42,7 +42,7 @@ class SettingsWindow(BaseWindow):
         self.l_style_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lay.addWidget(self.l_style_description)
 
-        self.cb_styles = QComboBox()
+        self.cb_styles = NonScrollingComboBox()
         # Get styles
         styles_list = os.listdir(STYLES_DIRECTORY)
 
@@ -64,7 +64,7 @@ class SettingsWindow(BaseWindow):
         self.l_language.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lay.addWidget(self.l_language)
 
-        self.cb_language = QComboBox()
+        self.cb_language = NonScrollingComboBox()
         # Get languages
         languages_list = os.listdir(MESSAGES_DIRECTORY)
         languages_list.sort()
@@ -73,6 +73,24 @@ class SettingsWindow(BaseWindow):
             self.cb_language.setCurrentText(session.get("settings")["language"])
         self.cb_language.currentTextChanged.connect(self.language_change)
         self.lay.addWidget(self.cb_language, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.lay.addSpacing(20)
+
+        # Header
+        self.l_header_title = WrappedLabel(text=session.get("msg")["settings"]["header-title"])
+        self.l_header_title.setAccessibleName("l_title")
+        self.l_header_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(self.l_header_title)
+
+        self.l_header_description = WrappedLabel(text=session.get("msg")["settings"]["header-description"])
+        self.l_header_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(self.l_header_description)
+
+        self.te_header = ExpandedTextEdit()
+        if "header" in session.get("settings"):
+            self.te_header.setText(session.get("settings")["header"])
+        self.te_header.setPlaceholderText(session.get("msg")["settings"]["header-title"])
+        self.lay.addWidget(self.te_header)
 
         self.lay.addSpacing(20)
 
@@ -114,7 +132,7 @@ class SettingsWindow(BaseWindow):
         self.l_default_printer_selection_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lay.addWidget(self.l_default_printer_selection_description)
 
-        self.cb_printers_list = QComboBox()
+        self.cb_printers_list = NonScrollingComboBox()
         self.cb_printers_list.addItem("") # First item blank
         self.cb_printers_list.addItems(printers_list)
         if "default_printer" in session.get("settings") and session.get("settings")["default_printer"] in printers_list:
@@ -151,7 +169,7 @@ class SettingsWindow(BaseWindow):
         self.l_default_orders_printer_selection_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lay.addWidget(self.l_default_orders_printer_selection_description)
 
-        self.cb_orders_printers_list = QComboBox()
+        self.cb_orders_printers_list = NonScrollingComboBox()
         self.cb_orders_printers_list.addItem("") # First item blank
         self.cb_orders_printers_list.addItems(printers_list)
         if "default_orders_printer" in session.get("settings") and session.get("settings")["default_orders_printer"] in printers_list:
@@ -202,6 +220,9 @@ class SettingsWindow(BaseWindow):
         self.l_style.setText(session.get("msg")["settings"]["style"])
         self.l_style_description.setText(session.get("msg")["settings"]["style-description"])
         self.l_language.setText(session.get("msg")["settings"]["language"])
+        self.l_header_title.setText(session.get("msg")["settings"]["header-title"])
+        self.l_header_description.setText(session.get("msg")["settings"]["header-description"])
+        self.te_header.setPlaceholderText(session.get("msg")["settings"]["header-title"])
         self.l_db_connection_title.setText(session.get("msg")["settings"]["database-connection-title"])
         self.l_db_connection_description.setText(session.get("msg")["settings"]["database-connection-description"])
         self.l_db_connection_local_warning.setText(session.get("msg")["settings"]["database-connection-local-warning"])
@@ -223,6 +244,7 @@ class SettingsWindow(BaseWindow):
         # Get fields
         style = self.cb_styles.currentText().lower()
         language = self.cb_language.currentText().lower()
+        header = self.te_header.toPlainText()
         db_connection = self.le_db_connection.text()
         default_printer = next((k for k, v in self.printers_dict.items() if v == self.cb_printers_list.currentText()), "")
         default_printer_paper_width = self.le_default_printer_paper_width.text()
@@ -234,10 +256,10 @@ class SettingsWindow(BaseWindow):
         # Check
         if db_connection != "":
             # Test database connection
-            client = MongoClient(db_connection, ServerSelectionTimeoutMS = 3000)
-
             try:
+                client = MongoClient(db_connection, ServerSelectionTimeoutMS = 3000)
                 client.admin.command("ping")
+
             except (ConnectionFailure, ServerSelectionTimeoutError) as e:
                 error_msg = QMessageBox(self)
                 error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
@@ -278,7 +300,7 @@ class SettingsWindow(BaseWindow):
         self.b_confirm.setEnabled(False)
 
         # Write settings to local database
-        write_settings(style, language, db_connection, default_printer, numeric_default_printer_paper_width, default_printer_autocut,
+        write_settings(style, language, header, db_connection, default_printer, numeric_default_printer_paper_width, default_printer_autocut,
                         default_orders_printer, numeric_default_orders_printer_paper_width, default_orders_printer_autocut)
 
         # Flag application to close programmatically

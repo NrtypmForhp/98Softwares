@@ -3,7 +3,7 @@
 # ----------------- MAIN VIEW ------------------
 # **********************************************
 
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLabel, QPushButton, QMessageBox, QApplication, QSizePolicy
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QFrame, QLabel, QPushButton, QMessageBox, QApplication
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QCloseEvent
 import os
@@ -65,6 +65,7 @@ class MainWindow(BaseWindow):
         f_orders.setCursor(Qt.CursorShape.PointingHandCursor)
         f_orders.setFixedHeight(150)
         f_orders_lay = QHBoxLayout(f_orders)
+        f_orders.clicked.connect(self.orders_window)
         bottom_frame_lay.addWidget(f_orders)
 
         # Orders frame
@@ -228,6 +229,10 @@ class MainWindow(BaseWindow):
     # Settings button
     def settings_button(self):
         windows_manager.open_window("settings_window")
+
+    # Orders window open
+    def orders_window(self):
+        windows_manager.open_window("orders_window")
 
     # Close event
     def closeEvent(self, event: QCloseEvent) -> None:

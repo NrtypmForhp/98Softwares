@@ -114,6 +114,20 @@ QLineEdit{
     color: rgb(10, 10, 10);
     padding: 4px;
 }
+QLineEdit:hover{
+    border: 2px solid rgb(79, 79, 79);
+}
+QTextEdit{
+    background: transparent;
+    min-width: 250px;
+    min-height: 50px;
+    border: 2px solid rgb(10, 10, 10);
+    color: rgb(10, 10, 10);
+    padding: 4px;
+}
+QTextEdit:hover{
+    border: 2px solid rgb(79, 79, 79);
+}
 QMessageBox QPushButton{
     background: transparent;
     padding: 6px 16px;

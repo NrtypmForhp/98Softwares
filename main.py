@@ -6,16 +6,11 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QFont, QFontDatabase
 import sys, os
 
-# Session import
-from modules.session import session
-
-# Modules import
-import modules.main as mm
-
 # Windows Manager import
 from modules.windows_manager import windows_manager
 from views.main import MainWindow
 from views.settings import SettingsWindow
+from views.orders import OrdersWindow
 
 # Constants import
 from modules.constants import FONTS_DIRECTORY, DATABASE_DIRECTORY
@@ -52,6 +47,7 @@ if __name__ == "__main__":
     # Start windows manager
     windows_manager.register_window("main_window", MainWindow)
     windows_manager.register_window("settings_window", SettingsWindow)
+    windows_manager.register_window("orders_window", OrdersWindow)
 
     windows_manager.open_window("main_window")
     sys.exit(app.exec())

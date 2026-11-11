@@ -38,7 +38,7 @@ def load_settings() -> None:
     session.set("settings", settings_dict)
 
 # Write settings (use only local database for settings)
-def write_settings(style:str, language:str, db_connection:str, default_printer:str, default_printer_paper_width:int, default_printer_autocut:bool,
+def write_settings(style:str, language:str, header:str, db_connection:str, default_printer:str, default_printer_paper_width:int, default_printer_autocut:bool,
                     default_orders_printer:str, default_orders_printer_paper_width:int, default_orders_printer_autocut:bool) -> None:
     settings_collection = local_db["settings"]
 
@@ -47,6 +47,7 @@ def write_settings(style:str, language:str, db_connection:str, default_printer:s
     query = {
         "style": style,
         "language": language,
+        "header": header,
         "db_connection": db_connection,
         "default_printer": default_printer,
         "default_printer_paper_width": default_printer_paper_width,

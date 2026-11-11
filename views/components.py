@@ -3,8 +3,9 @@
 # ----------------- COMPONENTS -----------------
 # **********************************************
 
-from PySide6.QtWidgets import QLabel, QSizePolicy, QLineEdit, QFrame
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtWidgets import QLabel, QSizePolicy, QLineEdit, QTextEdit, QFrame, QComboBox
+from PySide6.QtCore import Qt, QSize, Signal
+from PySide6.QtGui import QMouseEvent
 
 class WrappedLabel(QLabel):
     def __init__(self, text="", parent=None):
@@ -23,12 +24,34 @@ class ExpandedLineEdit(QLineEdit):
         # Enable expand to occupy all the space
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
-class ExpandedFrame(QFrame):
+class ExpandedTextEdit(QTextEdit):
     def __init__(self, parent=None):
         super().__init__(parent)
 
         # Enable expand to occupy all the space
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+
+class ExpandedFrame(QFrame):
+    clicked = Signal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # Enable expand to occupy all the space
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+
+    def mousePressEvent(self, event:QMouseEvent):
+        # Emit signal for left button
+        if event.button() == Qt.MouseButton.LeftButton: # LeftButton
+            self.clicked.emit()
+        super().mousePressEvent(event)
+
+class NonScrollingComboBox(QComboBox):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def wheelEvent(self, event):
+        event.ignore()
 
 class ProportionalImageLabel(QLabel):
     def __init__(self, pixmap, parent=None):
