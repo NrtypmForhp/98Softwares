@@ -12,7 +12,6 @@ header-description: Set the header of your company or association. It will be pr
 database-connection-title: Database connection
 database-connection-description: Connecting to a database (MongoDB). Leave blank to use an automatically created local database.
 database-connection-local-warning: WARNING!! A local database will not allow you to connect multiple devices at the same time!
-database-connection-test: Attempting to connect to the database!
 default-printer-title: Default printer
 default-printer-selection-description: Select default printer from list. Use only and exclusively thermal printers for receipts!
 default-printer-paper-width-description: Insert printer paper width in mm (usually can be 57 or 80).

@@ -12,7 +12,6 @@ header-description: Imposta l'intestazione della tua ditta o associazione. Verr�
 database-connection-title: Connessione al database
 database-connection-description: Connessione ad un database (MongoDB). Lascia vuoto per usare un database locale creato automaticamente.
 database-connection-local-warning: ATTENZIONE!! Un database locale non ti permetterà la connessione di più dispositivi contemporaneamente!
-database-connection-test: Tentativo di connessione al database!
 default-printer-title: Stampante predefinita
 default-printer-selection-description: Seleziona la stampante dalla lista. Usa solo ed esclusivamente stampanti termiche per scontrini!
 default-printer-paper-width-description: Inserisci la larghezza della carta stampante in mm (normalmente è 57 o 80).
