@@ -4,3 +4,5 @@
 # **********************************************
 
 title: 98Softwares - Comande
+customer-name: Nome cliente
+customer-table-number: Numero tavolo

@@ -73,6 +73,44 @@ QPushButton[accessibleName="b_red"]:hover{
 QPushButton[accessibleName="b_red"]:pressed{
     border: 2px solid rgb(255, 0, 0);
 }
+QPushButton[accessibleName="b_operation_button_minus"]{
+    background: transparent;
+    color: rgb(230, 24, 24);
+    border: 2px solid rgb(230, 24, 24);
+    padding: 0px;
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    min-width: 25px;
+    max-width: 25px;
+    min-height: 25px;
+    max-height: 25px;
+}
+QPushButton[accessibleName="b_operation_button_minus"]:hover{
+    border: 2px solid rgb(255, 0, 0);
+}
+QPushButton[accessibleName="b_operation_button_minus"]:pressed{
+    border: 2px solid rgb(255, 0, 0);
+}
+QPushButton[accessibleName="b_operation_button_plus"]{
+    background: transparent;
+    color: rgb(10, 148, 21);
+    border: 2px solid rgb(10, 148, 21);
+    padding: 0px;
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    min-width: 25px;
+    max-width: 25px;
+    min-height: 25px;
+    max-height: 25px;
+}
+QPushButton[accessibleName="b_operation_button_plus"]:hover{
+    border: 2px solid rgb(14, 219, 32);
+}
+QPushButton[accessibleName="b_operation_button_plus"]:pressed{
+    border: 2px solid rgb(14, 219, 32);
+}
 QComboBox{
     background-color: rgb(36, 36, 36);
     color: rgb(253, 222, 85);
@@ -115,6 +153,19 @@ QLineEdit{
     padding: 4px;
 }
 QLineEdit:hover{
+    border: 2px solid rgb(255, 255, 85);
+}
+QLineEdit[accessibleName="le_operation"]{
+    background: transparent;
+    min-width: 50px;
+    max-width: 50px;
+    min-height: 25px;
+    max-height: 25px;
+    border: 2px solid rgb(253, 222, 85);
+    color: rgb(253, 222, 85);
+    padding: 0px;
+}
+QLineEdit[accessibleName="le_operation"]:hover{
     border: 2px solid rgb(255, 255, 85);
 }
 QTextEdit{

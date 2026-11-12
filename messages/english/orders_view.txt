@@ -4,3 +4,5 @@
 # **********************************************
 
 title: 98Softwares - Orders
+customer-name: Customer name
+customer-table-number: Table number
