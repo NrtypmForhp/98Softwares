@@ -22,7 +22,7 @@ class BaseWindow(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
 
         self.setWindowTitle(title)
-        self.setMinimumSize(600, 400)
+        self.setMinimumSize(900, 700)
         self.resize(1200, 800)
 
         try:

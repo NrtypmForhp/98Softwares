@@ -6,3 +6,8 @@
 title: 98Softwares - Orders
 customer-name: Customer name
 customer-table-number: Table number
+print-receipt: Print receipt
+save-receipt: Save receipt
+print-order: Print order
+reprint-specific-receipt: Reprint receipt number
+reprint: Reprint
