@@ -11,3 +11,5 @@ save-receipt: Salva scontrino
 print-order: Stampa comanda
 reprint-specific-receipt: Ristampa lo scontrino numero
 reprint: Ristampa
+new-category: Nuova categoria
+new-category-description: Scrivi il nome della nuova categoria qui sotto per crearne una nuova!

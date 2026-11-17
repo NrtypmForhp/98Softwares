@@ -11,3 +11,5 @@ save-receipt: Save receipt
 print-order: Print order
 reprint-specific-receipt: Reprint receipt number
 reprint: Reprint
+new-category: New category
+new-category-description: Write the category name here to create a new one!

@@ -3,9 +3,12 @@
 # ----------------- COMPONENTS -----------------
 # **********************************************
 
-from PySide6.QtWidgets import QLabel, QSizePolicy, QLineEdit, QTextEdit, QFrame, QComboBox
+from PySide6.QtWidgets import QLabel, QPushButton, QSizePolicy, QLineEdit, QTextEdit, QFrame, QComboBox, QDialog, QVBoxLayout, QHBoxLayout
 from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtGui import QMouseEvent
+
+# Session import
+from modules.session import session
 
 class WrappedLabel(QLabel):
     def __init__(self, text="", parent=None):
@@ -52,6 +55,39 @@ class NonScrollingComboBox(QComboBox):
 
     def wheelEvent(self, event):
         event.ignore()
+
+class InputDialog(QDialog):
+    def __init__(self, title:str, message:str, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+
+        layout = QVBoxLayout(self)
+
+        # Message
+        l_message = WrappedLabel(text=message)
+        layout.addWidget(l_message)
+
+        # Text field
+        self.le_input = QLineEdit()
+        layout.addWidget(self.le_input)
+
+        # Confirm and Cancel buttons
+        b_layout = QHBoxLayout()
+
+        b_confirm = QPushButton(session.get("msg")["main_messages"]["confirm"])
+        b_confirm.setAccessibleName("b_main")
+        b_confirm.clicked.connect(self.accept)
+        b_layout.addWidget(b_confirm)
+
+        b_cancel = QPushButton(session.get("msg")["main_messages"]["cancel"])
+        b_cancel.setAccessibleName("b_main")
+        b_cancel.clicked.connect(self.reject)
+        b_layout.addWidget(b_cancel)
+
+        layout.addLayout(b_layout)
+
+    def get_text(self) -> str:
+        return self.le_input.text()
 
 class ProportionalImageLabel(QLabel):
     def __init__(self, pixmap, parent=None):

@@ -3,7 +3,7 @@
 # ---------------- ORDERS VIEW -----------------
 # **********************************************
 
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QLabel, QLineEdit, QPushButton
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QLabel, QLineEdit, QPushButton, QDialog
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 import os
@@ -14,11 +14,8 @@ from views.base_window import BaseWindow
 # Session import
 from modules.session import session
 
-# Modules import
-from modules.main import get_printers_dict
-
 # Components import
-from views.components import WrappedLabel, NonScrollingComboBox
+from views.components import WrappedLabel, NonScrollingComboBox, InputDialog
 
 # Constants import
 from modules.constants import PICTURES_DIRECTORY
@@ -70,20 +67,20 @@ class OrdersWindow(BaseWindow):
         table_controls_lay.setSpacing(5)
         table_controls_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.b_customer_table_minus = QPushButton("-")
-        self.b_customer_table_minus.setAccessibleName("b_operation_button_minus")
-        self.b_customer_table_minus.clicked.connect(self.table_button_minus)
-        table_controls_lay.addWidget(self.b_customer_table_minus)
+        b_customer_table_minus = QPushButton("-")
+        b_customer_table_minus.setAccessibleName("b_operation_button_minus")
+        b_customer_table_minus.clicked.connect(self.table_button_minus)
+        table_controls_lay.addWidget(b_customer_table_minus)
 
         self.le_customer_table = QLineEdit()
         self.le_customer_table.setAccessibleName("le_operation")
         self.le_customer_table.setText("-1")
         table_controls_lay.addWidget(self.le_customer_table)
 
-        self.b_customer_table_plus = QPushButton("+")
-        self.b_customer_table_plus.setAccessibleName("b_operation_button_plus")
-        self.b_customer_table_plus.clicked.connect(self.table_button_plus)
-        table_controls_lay.addWidget(self.b_customer_table_plus)
+        b_customer_table_plus = QPushButton("+")
+        b_customer_table_plus.setAccessibleName("b_operation_button_plus")
+        b_customer_table_plus.clicked.connect(self.table_button_plus)
+        table_controls_lay.addWidget(b_customer_table_plus)
 
         f_customer_details_lay.addLayout(table_controls_lay, 2, 0, Qt.AlignmentFlag.AlignCenter)
 
@@ -121,20 +118,20 @@ class OrdersWindow(BaseWindow):
         receipt_number_lay.setSpacing(5)
         receipt_number_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.b_receipt_number_minus = QPushButton("-")
-        self.b_receipt_number_minus.setAccessibleName("b_operation_button_minus")
-        self.b_receipt_number_minus.clicked.connect(self.receipt_number_minus)
-        receipt_number_lay.addWidget(self.b_receipt_number_minus)
+        b_receipt_number_minus = QPushButton("-")
+        b_receipt_number_minus.setAccessibleName("b_operation_button_minus")
+        b_receipt_number_minus.clicked.connect(self.receipt_number_minus)
+        receipt_number_lay.addWidget(b_receipt_number_minus)
 
         self.le_receipt_number = QLineEdit()
         self.le_receipt_number.setAccessibleName("le_operation")
         self.le_receipt_number.setText("1")
         receipt_number_lay.addWidget(self.le_receipt_number)
 
-        self.b_receipt_number_plus = QPushButton("+")
-        self.b_receipt_number_plus.setAccessibleName("b_operation_button_plus")
-        self.b_receipt_number_plus.clicked.connect(self.receipt_number_plus)
-        receipt_number_lay.addWidget(self.b_receipt_number_plus)
+        b_receipt_number_plus = QPushButton("+")
+        b_receipt_number_plus.setAccessibleName("b_operation_button_plus")
+        b_receipt_number_plus.clicked.connect(self.receipt_number_plus)
+        receipt_number_lay.addWidget(b_receipt_number_plus)
 
         f_print_order_lay.addLayout(receipt_number_lay)
 
@@ -143,6 +140,30 @@ class OrdersWindow(BaseWindow):
         f_print_order_lay.addWidget(b_reprint_receipt)
 
         f_print_order_lay.addStretch() # Push widgets to the top
+
+        # ** Bottom Frame **
+
+        # Products (left side)
+        f_products = QFrame()
+        f_products_lay = QVBoxLayout(f_products)
+        bottom_frame_lay.addWidget(f_products)
+
+        bottom_frame_lay.addStretch(1) # Absorbs the space to the rights of products frame
+
+        # Category
+        category_lay = QHBoxLayout()
+        category_lay.setSpacing(5)
+        category_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.cb_category = NonScrollingComboBox()
+        category_lay.addWidget(self.cb_category)
+
+        b_new_category = QPushButton(session.get("msg")["orders_view"]["new-category"])
+        b_new_category.setAccessibleName("b_main")
+        b_new_category.clicked.connect(self.new_category_button)
+        category_lay.addWidget(b_new_category)
+
+        f_products_lay.addLayout(category_lay)
 
     def table_button_minus(self): # Reduce the table number by 1
         table_number = self.le_customer_table.text()
@@ -203,3 +224,8 @@ class OrdersWindow(BaseWindow):
         if int_receipt_number > 1: int_receipt_number -= 1
 
         self.le_receipt_number.setText(str(int_receipt_number))
+
+    def new_category_button(self): # Press of new category button
+        dialog = InputDialog(session.get("msg")["orders_view"]["new-category"], session.get("msg")["orders_view"]["new-category-description"], self)
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            print(f"Inserted text: {dialog.get_text()}")
