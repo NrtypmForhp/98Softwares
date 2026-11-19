@@ -3,7 +3,7 @@
 # ---------- WINDOWS MANAGER MODULE ------------
 # **********************************************
 
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, Optional
 from PySide6.QtWidgets import QWidget
 
 class WindowsManager:

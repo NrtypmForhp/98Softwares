@@ -4,10 +4,8 @@
 # **********************************************
 
 from PySide6.QtWidgets import QPushButton, QLineEdit, QMessageBox, QApplication, QCheckBox
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QProcess
 import os, sys
-from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
 # Base window import
 from views.base_window import BaseWindow
@@ -21,6 +19,7 @@ from modules.session import session
 # Modules import
 from modules.main import get_printers_dict
 from modules.db import write_settings
+from modules.threads_manager import threads_manager
 
 # Constants import
 from modules.constants import MESSAGES_DIRECTORY, STYLES_DIRECTORY
@@ -253,19 +252,6 @@ class SettingsWindow(BaseWindow):
         default_orders_printer_paper_width = self.le_default_orders_printer_paper_width.text()
         default_orders_printer_autocut = self.c_default_orders_printer_autocut.isChecked()
 
-        # Check
-        if db_connection != "":
-            # Test database connection
-            try:
-                client = MongoClient(db_connection, ServerSelectionTimeoutMS = 3000)
-                client.admin.command("ping")
-
-            except (ConnectionFailure, ServerSelectionTimeoutError) as e:
-                error_msg = QMessageBox(self)
-                error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
-                error_msg.setText(session.get("msg")["errors"]["db-connection-failed"])
-                return error_msg.exec()
-
         numeric_default_printer_paper_width = 0
         numeric_default_orders_printer_paper_width = 0
 
@@ -297,18 +283,108 @@ class SettingsWindow(BaseWindow):
                 error_msg.setText(session.get("msg")["errors"]["printer-paper-width"])
                 return error_msg.exec()
 
+        self._pending_settings = (
+            style,
+            language,
+            header,
+            db_connection,
+            default_printer,
+            numeric_default_printer_paper_width,
+            default_printer_autocut,
+            default_orders_printer,
+            numeric_default_orders_printer_paper_width,
+            default_orders_printer_autocut,
+        )
+
+        # If no DB connection string is provided, save directly
+        if db_connection == "":
+            self._finalize_save_and_restart()
+            return
+
+        # Disable confirm button during async check
         self.b_confirm.setEnabled(False)
 
+        # Show non-blocking loading dialog
+        self.connection_test_msg = QMessageBox(self)
+        self.connection_test_msg.setWindowTitle(session.get("msg")["settings"]["database-connection-title"])
+        self.connection_test_msg.setText(session.get("msg")["settings"]["database-connection-test"])
+        self.connection_test_msg.setStandardButtons(QMessageBox.StandardButton.NoButton)
+        self.connection_test_msg.setWindowFlags(
+            self.connection_test_msg.windowFlags() | Qt.WindowType.WindowStaysOnTopHint
+        )
+        self.connection_test_msg.show()
+
+        # Start registered db_ping thread
+        threads_manager.start_thread(
+            "db_ping",
+            db_connection,
+            timeout=3000,
+            on_success=self._on_db_test_success,
+            on_error=self._on_db_test_error,
+            replace_if_running=True,
+        )
+
+    def _close_connection_test_msg(self):
+        msg = getattr(self, "connection_test_msg", None)
+        if msg is not None:
+            msg.hide()
+            msg.close()
+            msg.deleteLater()
+            self.connection_test_msg = None
+
+
+    def _on_db_test_success(self, _result):
+        self._close_connection_test_msg()
+        QApplication.processEvents()
+        self._finalize_save_and_restart()
+
+
+    def _on_db_test_error(self, _exc: Exception):
+        self._close_connection_test_msg()
+        QApplication.processEvents()
+        self.b_confirm.setEnabled(True)
+
+        error_msg = QMessageBox(self)
+        error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
+        error_msg.setText(session.get("msg")["errors"]["db-connection-failed"])
+        error_msg.exec()
+
+
+    def _finalize_save_and_restart(self):
+        self.b_confirm.setEnabled(False)
+
+        (
+            style,
+            language,
+            header,
+            db_connection,
+            default_printer,
+            numeric_default_printer_paper_width,
+            default_printer_autocut,
+            default_orders_printer,
+            numeric_default_orders_printer_paper_width,
+            default_orders_printer_autocut,
+        ) = self._pending_settings
+
         # Write settings to local database
-        write_settings(style, language, header, db_connection, default_printer, numeric_default_printer_paper_width, default_printer_autocut,
-                        default_orders_printer, numeric_default_orders_printer_paper_width, default_orders_printer_autocut)
+        write_settings(
+            style,
+            language,
+            header,
+            db_connection,
+            default_printer,
+            numeric_default_printer_paper_width,
+            default_printer_autocut,
+            default_orders_printer,
+            numeric_default_orders_printer_paper_width,
+            default_orders_printer_autocut,
+        )
 
         # Flag application to close programmatically
         app_instance = QApplication.instance()
         if app_instance is not None:
             app_instance.setProperty("is_restarting", True)
 
-        # Close settings window
-        from PySide6.QtCore import QProcess
+        # Restart application
         QProcess.startDetached(sys.executable, sys.argv)
         QApplication.quit()

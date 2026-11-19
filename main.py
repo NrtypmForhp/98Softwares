@@ -12,11 +12,14 @@ from views.main import MainWindow
 from views.settings import SettingsWindow
 from views.orders import OrdersWindow
 
+# Threads Manager import
+from modules.threads_manager import threads_manager, CallableThread
+
 # Constants import
 from modules.constants import FONTS_DIRECTORY, DATABASE_DIRECTORY
 
 # Database and files import
-from modules.db import load_settings
+from modules.db import load_settings, ping_mongo
 from modules.files_handle import load_messages
 
 if __name__ == "__main__":
@@ -48,6 +51,12 @@ if __name__ == "__main__":
     windows_manager.register_window("main_window", MainWindow)
     windows_manager.register_window("settings_window", SettingsWindow)
     windows_manager.register_window("orders_window", OrdersWindow)
+
+    # Start thread manager
+    threads_manager.register_thread(
+        "db_ping",
+        lambda conn_str, timeout=3000: CallableThread(ping_mongo, conn_str, timeout_ms=timeout)
+    )
 
     windows_manager.open_window("main_window")
     sys.exit(app.exec())

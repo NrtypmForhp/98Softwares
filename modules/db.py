@@ -7,6 +7,9 @@
 from mongita import MongitaClientDisk
 import os
 
+# ** Non local databases **
+from pymongo import MongoClient
+
 # Session import
 from modules.session import session
 
@@ -16,6 +19,15 @@ from modules.constants import DATABASE_DIRECTORY
 local_database_file_path = os.path.join(DATABASE_DIRECTORY, "98softwares_db")
 local_client = MongitaClientDisk(host=local_database_file_path)
 local_db = local_client["98softwares"]
+
+# Function to ping mongodb (only for non local database)
+def ping_mongo(db_connections_string: str, timeout_ms: int = 3000) -> bool:
+    client = MongoClient(db_connections_string, serverSelectionTimeoutMS=timeout_ms)
+    try:
+        client.admin.command("ping")
+        return True
+    finally:
+        client.close()
 
 # Function to load settings (use only local database for settings)
 def load_settings() -> None:
