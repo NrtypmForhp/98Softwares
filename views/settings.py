@@ -244,7 +244,7 @@ class SettingsWindow(BaseWindow):
         style = self.cb_styles.currentText().lower()
         language = self.cb_language.currentText().lower()
         header = self.te_header.toPlainText()
-        db_connection = self.le_db_connection.text()
+        db_connection = self.le_db_connection.text().replace(" ", "")
         default_printer = next((k for k, v in self.printers_dict.items() if v == self.cb_printers_list.currentText()), "")
         default_printer_paper_width = self.le_default_printer_paper_width.text()
         default_printer_autocut = self.c_default_printer_autocut.isChecked()

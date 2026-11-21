@@ -7,7 +7,7 @@
 from mongita import MongitaClientDisk
 import os
 
-# ** Non local databases **
+# ** Server hosted databases **
 from pymongo import MongoClient
 
 # Session import
@@ -20,7 +20,43 @@ local_database_file_path = os.path.join(DATABASE_DIRECTORY, "98softwares_db")
 local_client = MongitaClientDisk(host=local_database_file_path)
 local_db = local_client["98softwares"]
 
-# Function to ping mongodb (only for non local database)
+settings = session.get("settings") or {}
+db_connection = (settings.get("db_connection") or "").strip()
+
+server_hosted_client = (
+    MongoClient(db_connection, serverSelectionTimeoutMS=3000)
+    if db_connection
+    else None
+)
+server_hosted_db = (
+    server_hosted_client["98softwares"]
+    if server_hosted_client is not None
+    else None
+)
+
+# Find one from database
+def find_one(collection:str, filter:dict = {}, projection:dict = {}):
+    # If it's a local database
+    if session.get("settings")["db_connection"] == "":
+        col = local_db[collection]
+    # If it's a server hosted database
+    else:
+        col = server_hosted_db[collection]
+
+    return col.find_one(filter, projection)
+
+# Insert one into database
+def insert_one(collection:str, query:dict):
+    # If it's a local database
+    if session.get("settings")["db_connection"] == "":
+        col = local_db[collection]
+    # If it's a server hosted database
+    else:
+        col = server_hosted_db[collection]
+
+    col.insert_one(query)
+
+# Function to ping mongodb (only for server hosted database)
 def ping_mongo(db_connections_string: str, timeout_ms: int = 3000) -> bool:
     client = MongoClient(db_connections_string, serverSelectionTimeoutMS=timeout_ms)
     try:
@@ -70,3 +106,14 @@ def write_settings(style:str, language:str, header:str, db_connection:str, defau
     }
 
     settings_collection.replace_one({}, query, upsert=True)
+
+# ** Orders **
+
+# Create new category
+def create_new_category(category:str) -> str:
+    # Check if category already exists
+    if find_one("orders", {"category": category}) != None:
+        return "category_already_exists"
+
+    insert_one("orders", {"category": category})
+    return "ok"

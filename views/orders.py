@@ -3,7 +3,7 @@
 # ---------------- ORDERS VIEW -----------------
 # **********************************************
 
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QLabel, QLineEdit, QPushButton, QDialog
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QLabel, QLineEdit, QPushButton, QDialog, QMessageBox
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt
 import os
@@ -13,6 +13,9 @@ from views.base_window import BaseWindow
 
 # Session import
 from modules.session import session
+
+# Database import
+from modules.db import create_new_category
 
 # Components import
 from views.components import WrappedLabel, NonScrollingComboBox, InputDialog
@@ -228,4 +231,12 @@ class OrdersWindow(BaseWindow):
     def new_category_button(self): # Press of new category button
         dialog = InputDialog(session.get("msg")["orders_view"]["new-category"], session.get("msg")["orders_view"]["new-category-description"], self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            print(f"Inserted text: {dialog.get_text()}")
+
+            category = dialog.get_text().strip().upper()
+            response = create_new_category(category)
+
+            if response != "ok": # If category already exists, simply set the combobox text to the existint category
+                self.cb_category.setCurrentText(category)
+            else:
+                self.cb_category.addItem(category)
+                self.cb_category.setCurrentText(category)

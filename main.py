@@ -6,6 +6,12 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QFont, QFontDatabase
 import sys, os
 
+# Constants import
+from modules.constants import FONTS_DIRECTORY, DATABASE_DIRECTORY
+
+# Check if database directory exists
+os.makedirs(DATABASE_DIRECTORY, exist_ok=True)
+
 # Windows Manager import
 from modules.windows_manager import windows_manager
 from views.main import MainWindow
@@ -14,9 +20,6 @@ from views.orders import OrdersWindow
 
 # Threads Manager import
 from modules.threads_manager import threads_manager, CallableThread
-
-# Constants import
-from modules.constants import FONTS_DIRECTORY, DATABASE_DIRECTORY
 
 # Database and files import
 from modules.db import load_settings, ping_mongo
@@ -39,9 +42,6 @@ if __name__ == "__main__":
             app.setFont(global_font)
     else:
         print("Warning! Error on loading custom font! Default font will be used.")
-
-    # Check if database directory exists
-    if not os.path.exists(DATABASE_DIRECTORY): os.mkdir(DATABASE_DIRECTORY)
 
     # Load session
     load_settings()

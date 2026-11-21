@@ -6,3 +6,4 @@
 settings: Impostazioni
 confirm: Conferma
 cancel: Annulla
+warning: Attenzione
