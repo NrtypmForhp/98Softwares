@@ -15,7 +15,7 @@ from views.base_window import BaseWindow
 from modules.session import session
 
 # Database import
-from modules.db import create_new_category
+from modules.db import load_categories, create_new_category, delete_category
 
 # Components import
 from views.components import WrappedLabel, NonScrollingComboBox, InputDialog
@@ -159,12 +159,19 @@ class OrdersWindow(BaseWindow):
         category_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.cb_category = NonScrollingComboBox()
+        categories_list = load_categories()
+        self.cb_category.addItems(categories_list)
         category_lay.addWidget(self.cb_category)
 
         b_new_category = QPushButton(session.get("msg")["orders_view"]["new-category"])
         b_new_category.setAccessibleName("b_main")
         b_new_category.clicked.connect(self.new_category_button)
         category_lay.addWidget(b_new_category)
+
+        b_delete_category = QPushButton(session.get("msg")["orders_view"]["delete-category"])
+        b_delete_category.setAccessibleName("b_red")
+        b_delete_category.clicked.connect(self.delete_category_button)
+        category_lay.addWidget(b_delete_category)
 
         f_products_lay.addLayout(category_lay)
 
@@ -228,7 +235,7 @@ class OrdersWindow(BaseWindow):
 
         self.le_receipt_number.setText(str(int_receipt_number))
 
-    def new_category_button(self): # Press of new category button
+    def new_category_button(self): # Press on new category button
         dialog = InputDialog(session.get("msg")["orders_view"]["new-category"], session.get("msg")["orders_view"]["new-category-description"], self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
 
@@ -240,3 +247,21 @@ class OrdersWindow(BaseWindow):
             else:
                 self.cb_category.addItem(category)
                 self.cb_category.setCurrentText(category)
+
+    def delete_category_button(self): # Press on delete category button
+        # Set a confirm message
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle(session.get("msg")["orders_view"]["delete-category"])
+        msg_box.setText(session.get("msg")["orders_view"]["confirm-delete-category-description"])
+
+        btn_yes = msg_box.addButton(session.get("msg")["main_messages"]["confirm"], QMessageBox.ButtonRole.YesRole)
+        btn_no = msg_box.addButton(session.get("msg")["main_messages"]["cancel"], QMessageBox.ButtonRole.NoRole)
+
+        msg_box.setDefaultButton(btn_no) # Default button if you press Enter
+
+        msg_box.exec()
+
+        if msg_box.clickedButton() == btn_yes:
+            category = self.cb_category.currentText()
+            delete_category(category)
+            self.cb_category.removeItem(self.cb_category.currentIndex())

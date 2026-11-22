@@ -13,3 +13,5 @@ reprint-specific-receipt: Ristampa lo scontrino numero
 reprint: Ristampa
 new-category: Nuova categoria
 new-category-description: Scrivi il nome della nuova categoria qui sotto per crearne una nuova!
+delete-category: Elimina categoria
+confirm-delete-category-description: Vuoi eliminare la categoria in uso? Oltre alla categoria perderai anche tutti i prodotti al suo interno!
