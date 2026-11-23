@@ -3,12 +3,15 @@
 # --------------- DATABASE MODULE --------------
 # **********************************************
 
+from PySide6.QtWidgets import QMessageBox
+
 # ** Local databases **
 from mongita import MongitaClientDisk
 import os
 
 # ** Server hosted databases **
 from pymongo import MongoClient
+from pymongo.errors import PyMongoError
 
 # Session import
 from modules.session import session
@@ -16,46 +19,73 @@ from modules.session import session
 # Constants import
 from modules.constants import DATABASE_DIRECTORY
 
-local_database_file_path = os.path.join(DATABASE_DIRECTORY, "98softwares_db")
-local_client = MongitaClientDisk(host=local_database_file_path)
-local_db = local_client["98softwares"]
-
-settings = session.get("settings") or {}
-db_connection = (settings.get("db_connection") or "").strip()
-
-server_hosted_client = (
-    MongoClient(db_connection, serverSelectionTimeoutMS=3000)
-    if db_connection
-    else None
-)
-server_hosted_db = (
-    server_hosted_client["98softwares"]
-    if server_hosted_client is not None
-    else None
-)
-
 # ** Database functions **
 
-# Function to update server hosted database
-def update_server_hosted_database() -> None:
-    global server_hosted_client
-    global server_hosted_db
-    global settings
-    global db_connection
+class RemoteDatabaseError(Exception):
+    """Error during operation on remote database."""
+
+# Global database variables
+_local_client: MongitaClientDisk | None = None
+_local_db = None
+
+_cached_remote_uri: str | None = None
+_remote_client: MongoClient | None = None
+_remote_db = None
+
+# Function to get cached local db
+def _get_local_db():
+    global _local_client, _local_db
+
+    if _local_client is None:
+        local_database_file_path = os.path.join(DATABASE_DIRECTORY, "98softwares_db")
+        _local_client = MongitaClientDisk(host=local_database_file_path)
+        _local_db = _local_client["98softwares"]
+
+    return _local_db
+
+# Function to close remote client
+def _close_remote_client() -> None:
+    global _cached_remote_uri, _remote_client, _remote_db
+
+    if _remote_client is not None:
+        _remote_client.close()
+
+    _cached_remote_uri = None
+    _remote_client = None
+    _remote_db = None
+
+# Function to get the correct database (local or server hosted), return True if is local, False if is server hosted
+def _get_current_db(force_local:bool = False, check_remote: bool = True):
+    local_db = _get_local_db()
+
+    if force_local:
+        return local_db, True
 
     settings = session.get("settings") or {}
     db_connection = (settings.get("db_connection") or "").strip()
 
-    server_hosted_client = (
-        MongoClient(db_connection, serverSelectionTimeoutMS=3000)
-        if db_connection
-        else None
-    )
-    server_hosted_db = (
-        server_hosted_client["98softwares"]
-        if server_hosted_client is not None
-        else None
-    )
+    if not db_connection:
+        _close_remote_client()
+        return local_db, True
+
+    # If URI is changed or not exists
+    if db_connection != _cached_remote_uri or _remote_client is None:
+        _close_remote_client()
+        client = MongoClient(db_connection, serverSelectionTimeoutMS=3000)
+        try:
+            if check_remote:
+                client.admin.command("ping")
+        except PyMongoError as exc:
+            client.close()
+            raise RemoteDatabaseError(
+                f"Impossible to reach remote database: {exc}"
+            ) from exc
+
+        globals()["_remote_client"] = client
+        globals()["_cached_remote_uri"] = db_connection
+        globals()["_remote_db"] = client["98softwares"]
+
+    return _remote_db, False
 
 # Apply projection for local database
 def _apply_projection(docs: list[dict], projection: dict) -> list[dict]:
@@ -79,71 +109,102 @@ def find_one(collection:str, filter:dict | None = None, projection:dict | None =
     query_filter = filter if filter is not None else {}
     query_projection = projection if projection is not None else {}
 
-    # If it's a local database
-    if not db_connection:
-        col = local_db[collection]
-        doc = col.find_one(query_filter)
-        if doc is not None and query_projection:
-            return _apply_projection([doc], query_projection)[0]
-        return doc
-    # If it's a server hosted database
-    if server_hosted_db is not None:
-        col = server_hosted_db[collection]
-        if query_projection:
-            return col.find_one(query_filter, projection=query_projection)
-        return col.find_one(query_filter)
+    db, is_local = _get_current_db()
 
-    return None
+    if db is None:
+        raise RemoteDatabaseError("Connection to remote database failed!")
+
+    try:
+        # If it's a local database
+        if is_local:
+            col = db[collection]
+            doc = col.find_one(query_filter)
+            if doc is not None and query_projection:
+                return _apply_projection([doc], query_projection)[0]
+            return doc
+        # If it's a server hosted database
+        else:
+            col = db[collection]
+            if query_projection:
+                return col.find_one(query_filter, query_projection)
+            return col.find_one(query_filter)
+    except PyMongoError as exc:
+        if not is_local:
+            raise RemoteDatabaseError(
+                f"Impossible to connect to remote database: {exc}"
+            ) from exc
+        raise
 
 # Find all from database
 def find_all(collection:str, filter:dict | None = None, projection:dict | None = None):
     query_filter = filter if filter is not None else {}
     query_projection = projection if projection is not None else {}
 
-    # If it's a local database
-    if not db_connection:
-        col = local_db[collection]
-        cursor = col.find(query_filter)
-        if query_projection:
-            return _apply_projection(list(cursor), query_projection)
-        return cursor
-    # If it's a server hosted database
-    if server_hosted_db is not None:
-        col = server_hosted_db[collection]
-        if query_projection:
-            return col.find(query_filter, projection=query_projection)
-        return col.find(query_filter)
+    db, is_local = _get_current_db()
 
-    return []
+    if db is None:
+        raise RemoteDatabaseError("Connection to remote database failed!")
+
+    try:
+        # If it's a local database
+        if is_local:
+            col = db[collection]
+            cursor = col.find(query_filter)
+            if query_projection:
+                return _apply_projection(list(cursor), query_projection)
+            return cursor
+        # If it's a server hosted database
+        else:
+            col = db[collection]
+            if query_projection:
+                return col.find(query_filter, query_projection)
+            return col.find(query_filter)
+    except PyMongoError as exc:
+        if not is_local:
+            raise RemoteDatabaseError(
+                f"Impossible to connect to remote database: {exc}"
+            ) from exc
+        raise
 
 # Insert one into database
 def insert_one(collection:str, p_query:dict | None = None):
     query = p_query if p_query is not None else {}
-    # If it's a local database
-    if not db_connection:
-        col = local_db[collection]
-    # If it's a server hosted database
-    elif server_hosted_db is not None:
-        col = server_hosted_db[collection]
-    else:
-        return None
 
-    col.insert_one(query)
+    db, is_local = _get_current_db()
+
+    if db is None:
+        raise RemoteDatabaseError("Connection to remote database failed!")
+
+    try:
+        col = db[collection]
+
+        col.insert_one(query)
+    except PyMongoError as exc:
+        if not is_local:
+            raise RemoteDatabaseError(
+                f"Impossible to connect to remote database: {exc}"
+            ) from exc
+        raise
 
 # Delete one from database
 def delete_one(collection:str, p_query:dict | None = None):
     query = p_query if p_query is not None else {}
 
-    # If it's a local database
-    if not db_connection:
-        col = local_db[collection]
-    # If it's a server hosted database
-    elif server_hosted_db is not None:
-        col = server_hosted_db[collection]
-    else:
-        return None
+    db, is_local = _get_current_db()
 
-    col.delete_one(query)
+    if db is None:
+        raise RemoteDatabaseError("Connection to remote database failed!")
+
+    try:
+        col = db[collection]
+
+        col.delete_one(query)
+    except PyMongoError as exc:
+        if not is_local:
+            raise RemoteDatabaseError(
+                f"Impossible to connect to remote database: {exc}"
+            ) from exc
+        raise
 
 # Function to ping mongodb (only for server hosted database)
 def ping_mongo(db_connections_string: str, timeout_ms: int = 3000) -> bool:
@@ -162,7 +223,11 @@ def load_settings() -> None:
     }
 
     try:
-        settings_collection = local_db["settings"]
+        db, is_local = _get_current_db(True)
+        if db is None:
+            raise RemoteDatabaseError("Connection to remote database failed!")
+
+        settings_collection = db["settings"]
         settings = settings_collection.find_one()
 
         if settings is not None:
@@ -174,13 +239,16 @@ def load_settings() -> None:
 
     session.set("settings", settings_dict)
 
-    # Update server hosted database connections strings
-    update_server_hosted_database()
-
 # Write settings (use only local database for settings)
 def write_settings(style:str, language:str, header:str, db_connection:str, default_printer:str, default_printer_paper_width:int, default_printer_autocut:bool,
                     default_orders_printer:str, default_orders_printer_paper_width:int, default_orders_printer_autocut:bool) -> None:
-    settings_collection = local_db["settings"]
+
+    db, is_local = _get_current_db(True)
+
+    if db is None:
+        raise RemoteDatabaseError("Connection to remote database failed!")
+
+    settings_collection = db["settings"]
 
     query = {
         "style": style,
@@ -200,7 +268,7 @@ def write_settings(style:str, language:str, header:str, db_connection:str, defau
 # ** Orders **
 
 # Load categories
-def load_categories() -> list:
+def load_categories() -> list[str]:
     categories = find_all("orders_categories", {}, {"category": 1})
     if categories is None: return []
 

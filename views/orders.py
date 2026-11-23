@@ -5,7 +5,7 @@
 
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QLabel, QLineEdit, QPushButton, QDialog, QMessageBox
 from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 import os
 
 # Base window import
@@ -159,7 +159,16 @@ class OrdersWindow(BaseWindow):
         category_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.cb_category = NonScrollingComboBox()
-        categories_list = load_categories()
+        try:
+            categories_list = load_categories()
+        except Exception:
+            error_msg = QMessageBox(self)
+            error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
+            error_msg.setText(session.get("msg")["errors"]["db-connection-failed"])
+            error_msg.exec()
+            QTimer.singleShot(0, self.close)
+            return
+
         self.cb_category.addItems(categories_list)
         category_lay.addWidget(self.cb_category)
 
@@ -240,7 +249,14 @@ class OrdersWindow(BaseWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
 
             category = dialog.get_text().strip().upper()
-            response = create_new_category(category)
+            try:
+                response = create_new_category(category)
+            except Exception:
+                error_msg = QMessageBox(self)
+                error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
+                error_msg.setText(session.get("msg")["errors"]["db-connection-failed"])
+                error_msg.exec()
+                return
 
             if response != "ok": # If category already exists, simply set the combobox text to the existint category
                 self.cb_category.setCurrentText(category)
@@ -263,5 +279,12 @@ class OrdersWindow(BaseWindow):
 
         if msg_box.clickedButton() == btn_yes:
             category = self.cb_category.currentText()
-            delete_category(category)
+            try:
+                delete_category(category)
+            except Exception:
+                error_msg = QMessageBox(self)
+                error_msg.setWindowTitle(session.get("msg")["errors"]["error"])
+                error_msg.setText(session.get("msg")["errors"]["db-connection-failed"])
+                error_msg.exec()
+                return
             self.cb_category.removeItem(self.cb_category.currentIndex())
