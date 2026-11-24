@@ -4,5 +4,6 @@
 # **********************************************
 
 error: Errore
+warning: Attenzione
 db-connection-failed: Connessione al database fallita! Controlla la stringa di connessione.
 printer-paper-width: Inserisci la larghezza della carta della stampante. Usa solo numeri positivi nel campo!

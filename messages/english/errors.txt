@@ -4,5 +4,6 @@
 # **********************************************
 
 error: Error
+warning: Warning
 db-connection-failed: Database connection failed! Please check the connection string.
 printer-paper-width: Insert printer paper width in mm. Use only positive numbers in the field!

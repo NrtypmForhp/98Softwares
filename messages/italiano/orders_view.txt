@@ -9,9 +9,12 @@ customer-table-number: Numero tavolo
 print-receipt: Stampa scontrino
 save-receipt: Salva scontrino
 print-order: Stampa comanda
-reprint-specific-receipt: Ristampa lo scontrino numero
-reprint: Ristampa
+reprint-receipt: Ristampa scontrino
+reprint-order: Ristampa comanda
 new-category: Nuova categoria
 new-category-description: Scrivi il nome della nuova categoria qui sotto per crearne una nuova!
 delete-category: Elimina categoria
 confirm-delete-category-description: Vuoi eliminare la categoria in uso? Oltre alla categoria perderai anche tutti i prodotti al suo interno!
+no-categories-warning: Non esistono categorie! Creane una con il pulsante "NUOVA CATEGORIA"
+new-product: Nuovo prodotto
+create-modify-product: Crea o modifica prodotto

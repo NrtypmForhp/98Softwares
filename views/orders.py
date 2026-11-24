@@ -5,11 +5,14 @@
 
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QLabel, QLineEdit, QPushButton, QDialog, QMessageBox
 from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, Signal
 import os
 
 # Base window import
 from views.base_window import BaseWindow
+
+# Base dialog import
+from views.base_dialog import BaseDialog
 
 # Session import
 from modules.session import session
@@ -23,6 +26,14 @@ from views.components import WrappedLabel, NonScrollingComboBox, InputDialog
 # Constants import
 from modules.constants import PICTURES_DIRECTORY
 
+# ** Create or modify product
+class CreateModifyProduct(BaseDialog):
+    final_product = Signal(dict)
+
+    def __init__(self, parent=None):
+        super().__init__(title=session.get("msg")["orders_view"]["create-modify-product"])
+
+# ** Main Window **
 class OrdersWindow(BaseWindow):
     def __init__(self):
         super().__init__(title=session.get("msg")["orders_view"]["title"])
@@ -101,9 +112,13 @@ class OrdersWindow(BaseWindow):
         b_save_receipt.setAccessibleName("b_main")
         f_print_save_receipt_lay.addWidget(b_save_receipt)
 
+        b_reprint_receipt = QPushButton(session.get("msg")["orders_view"]["reprint-receipt"])
+        b_reprint_receipt.setAccessibleName("b_main")
+        f_print_save_receipt_lay.addWidget(b_reprint_receipt)
+
         f_print_save_receipt_lay.addStretch() # Push widgets to the top
 
-        # Print order and reprint specific receipt (right second)
+        # Print order and reprint specific order (right third)
         f_print_order = QFrame()
         f_print_order_lay = QVBoxLayout(f_print_order)
         f_print_order_lay.setSpacing(5)
@@ -113,34 +128,9 @@ class OrdersWindow(BaseWindow):
         b_print_order.setAccessibleName("b_main")
         f_print_order_lay.addWidget(b_print_order)
 
-        l_reprint_specific_receipt = WrappedLabel(text=session.get("msg")["orders_view"]["reprint-specific-receipt"])
-        l_reprint_specific_receipt.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        f_print_order_lay.addWidget(l_reprint_specific_receipt)
-
-        receipt_number_lay = QHBoxLayout()
-        receipt_number_lay.setSpacing(5)
-        receipt_number_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        b_receipt_number_minus = QPushButton("-")
-        b_receipt_number_minus.setAccessibleName("b_operation_button_minus")
-        b_receipt_number_minus.clicked.connect(self.receipt_number_minus)
-        receipt_number_lay.addWidget(b_receipt_number_minus)
-
-        self.le_receipt_number = QLineEdit()
-        self.le_receipt_number.setAccessibleName("le_operation")
-        self.le_receipt_number.setText("1")
-        receipt_number_lay.addWidget(self.le_receipt_number)
-
-        b_receipt_number_plus = QPushButton("+")
-        b_receipt_number_plus.setAccessibleName("b_operation_button_plus")
-        b_receipt_number_plus.clicked.connect(self.receipt_number_plus)
-        receipt_number_lay.addWidget(b_receipt_number_plus)
-
-        f_print_order_lay.addLayout(receipt_number_lay)
-
-        b_reprint_receipt = QPushButton(session.get("msg")["orders_view"]["reprint"])
-        b_reprint_receipt.setAccessibleName("b_main")
-        f_print_order_lay.addWidget(b_reprint_receipt)
+        b_reprint_order = QPushButton(session.get("msg")["orders_view"]["reprint-order"])
+        b_reprint_order.setAccessibleName("b_main")
+        f_print_order_lay.addWidget(b_reprint_order)
 
         f_print_order_lay.addStretch() # Push widgets to the top
 
@@ -182,7 +172,14 @@ class OrdersWindow(BaseWindow):
         b_delete_category.clicked.connect(self.delete_category_button)
         category_lay.addWidget(b_delete_category)
 
+        b_new_product = QPushButton(session.get("msg")["orders_view"]["new-product"])
+        b_new_product.setAccessibleName("b_main")
+        b_new_product.clicked.connect(self.new_product_button)
+        category_lay.addWidget(b_new_product)
+
         f_products_lay.addLayout(category_lay)
+
+        f_products_lay.addStretch() # Push widgets to the top
 
     def table_button_minus(self): # Reduce the table number by 1
         table_number = self.le_customer_table.text()
@@ -214,36 +211,6 @@ class OrdersWindow(BaseWindow):
 
         self.le_customer_table.setText(str(int_table_number))
 
-    def receipt_number_plus(self): # Add 1 to the receipt number
-        receipt_number = self.le_receipt_number.text()
-
-        # Check if receipt number is a number, if not set it to 1
-        try:
-            int_receipt_number = int(receipt_number)
-        except ValueError: return self.le_receipt_number.setText("1")
-
-        if int_receipt_number < 1: return self.le_receipt_number.setText("1")
-        if int_receipt_number > 999: return self.le_receipt_number.setText("999")
-
-        if int_receipt_number < 999: int_receipt_number += 1
-
-        self.le_receipt_number.setText(str(int_receipt_number))
-
-    def receipt_number_minus(self): # Reduce the receipt number by 1
-        receipt_number = self.le_receipt_number.text()
-
-        # Check if receipt number is a number, if not set it to 1
-        try:
-            int_receipt_number = int(receipt_number)
-        except ValueError: return self.le_receipt_number.setText("1")
-
-        if int_receipt_number < 1: return self.le_receipt_number.setText("1")
-        if int_receipt_number > 999: return self.le_receipt_number.setText("999")
-
-        if int_receipt_number > 1: int_receipt_number -= 1
-
-        self.le_receipt_number.setText(str(int_receipt_number))
-
     def new_category_button(self): # Press on new category button
         dialog = InputDialog(session.get("msg")["orders_view"]["new-category"], session.get("msg")["orders_view"]["new-category-description"], self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
@@ -265,6 +232,14 @@ class OrdersWindow(BaseWindow):
                 self.cb_category.setCurrentText(category)
 
     def delete_category_button(self): # Press on delete category button
+        # Check if a category is selected
+        if self.cb_category.currentText() == "":
+            error_msg = QMessageBox(self)
+            error_msg.setWindowTitle(session.get("msg")["errors"]["warning"])
+            error_msg.setText(session.get("msg")["orders_view"]["no-categories-warning"])
+            error_msg.exec()
+            return
+
         # Set a confirm message
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle(session.get("msg")["orders_view"]["delete-category"])
@@ -288,3 +263,15 @@ class OrdersWindow(BaseWindow):
                 error_msg.exec()
                 return
             self.cb_category.removeItem(self.cb_category.currentIndex())
+
+    def new_product_button(self): # Press on new product button
+        # Check if a category is selected
+        if self.cb_category.currentText() == "":
+            error_msg = QMessageBox(self)
+            error_msg.setWindowTitle(session.get("msg")["errors"]["warning"])
+            error_msg.setText(session.get("msg")["orders_view"]["no-categories-warning"])
+            error_msg.exec()
+            return
+
+        dialog = CreateModifyProduct(self)
+        dialog.exec()
