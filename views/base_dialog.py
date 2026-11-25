@@ -14,8 +14,8 @@ from modules.session import session
 from modules.constants import STYLES_DIRECTORY
 
 class BaseDialog(QDialog):
-    def __init__(self, title="98Softwares"):
-        super().__init__()
+    def __init__(self, title="98Softwares", parent=None):
+        super().__init__(parent)
 
         # Destroy window from memory when closed
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)

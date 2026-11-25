@@ -208,3 +208,41 @@ QCheckBox::indicator:checked{
 QCheckBox::indicator:unchecked{
     background-color: transparent;
 }
+QTableWidget{
+    background-color: rgb(36, 36, 36);
+    color: rgb(253, 222, 85);
+    border: 2px solid rgb(253, 222, 85);
+    gridline-color: rgba(253, 222, 85, 0.35);
+    outline: none;
+}
+QTableWidget:hover{
+    border: 2px solid rgb(255, 255, 85);
+}
+QTableWidget::item{
+    padding: 4px 8px;
+    border: none;
+}
+QTableWidget::item:selected{
+    background-color: rgba(253, 222, 85, 0.2);
+    color: rgb(255, 255, 85);
+}
+QHeaderView{
+    background-color: rgb(36, 36, 36);
+}
+QHeaderView::section{
+    background-color: rgb(36, 36, 36);
+    color: rgb(253, 222, 85);
+    border: none;
+    border-right: 1px solid rgb(253, 222, 85);
+    border-bottom: 2px solid rgb(253, 222, 85);
+    padding: 6px 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+QHeaderView::section:hover{
+    color: rgb(255, 255, 85);
+    border-bottom: 2px solid rgb(255, 255, 85);
+}
+QHeaderView::section:last{
+    border-right: none;
+}

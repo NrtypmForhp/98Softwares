@@ -3,7 +3,7 @@
 # ---------------- ORDERS VIEW -----------------
 # **********************************************
 
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QLabel, QLineEdit, QPushButton, QDialog, QMessageBox
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QLabel, QLineEdit, QPushButton, QDialog, QMessageBox, QHeaderView
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt, QTimer, Signal
 import os
@@ -21,7 +21,7 @@ from modules.session import session
 from modules.db import load_categories, create_new_category, delete_category
 
 # Components import
-from views.components import WrappedLabel, NonScrollingComboBox, InputDialog
+from views.components import WrappedLabel, NonScrollingComboBox, InputDialog, ExpandedLineEdit, ExpandedTableWidget
 
 # Constants import
 from modules.constants import PICTURES_DIRECTORY
@@ -30,8 +30,62 @@ from modules.constants import PICTURES_DIRECTORY
 class CreateModifyProduct(BaseDialog):
     final_product = Signal(dict)
 
-    def __init__(self, parent=None):
+    def __init__(self, category:str, product_data:dict={}, parent=None):
         super().__init__(title=session.get("msg")["orders_view"]["create-modify-product"])
+
+        # Set main layout
+        self.lay = self.content_layout
+
+        l_category = WrappedLabel(text=f'{session.get("msg")["orders_view"]["create-modify-product-category"]} {category}')
+        l_category.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(l_category)
+
+        self.lay.addSpacing(10)
+
+        l_name_description = WrappedLabel(text=session.get("msg")["orders_view"]["product-name-description"])
+        l_name_description.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(l_name_description)
+
+        self.le_product_name = ExpandedLineEdit()
+        self.le_product_name.setText(product_data.get("product_name", ""))
+        self.le_product_name.setPlaceholderText(session.get("msg")["orders_view"]["product-name"])
+        self.le_product_name.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(self.le_product_name)
+
+        self.lay.addSpacing(10)
+
+        l_product_price = WrappedLabel(text=session.get("msg")["orders_view"]["product-price-description"])
+        l_product_price.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(l_product_price)
+
+        self.le_product_price = ExpandedLineEdit()
+        if product_data.get("product_price", "") != "":
+            product_price = f"{float(product_data['product_price']):.2f}"
+        else: product_price = ""
+        self.le_product_price.setText(product_price)
+        self.le_product_price.setPlaceholderText(session.get("msg")["orders_view"]["product-price"])
+        self.le_product_price.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(self.le_product_price)
+
+        self.lay.addSpacing(10)
+
+        l_product_additions = WrappedLabel(text=session.get("msg")["orders_view"]["product-additions"])
+        l_product_additions.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lay.addWidget(l_product_additions)
+
+        b_new_addition = QPushButton(session.get("msg")["orders_view"]["new-addition"])
+        b_new_addition.setAccessibleName("b_main")
+        self.lay.addWidget(b_new_addition, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.product_additions_table = ExpandedTableWidget(0, 2)
+        self.product_additions_table.setHorizontalHeaderLabels([
+            session.get("msg")["orders_view"]["addition"],
+            session.get("msg")["orders_view"]["product-price"]
+        ])
+        self.product_additions_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.lay.addWidget(self.product_additions_table)
+
+        self.lay.addStretch() # Push widgets up
 
 # ** Main Window **
 class OrdersWindow(BaseWindow):
@@ -273,5 +327,5 @@ class OrdersWindow(BaseWindow):
             error_msg.exec()
             return
 
-        dialog = CreateModifyProduct(self)
+        dialog = CreateModifyProduct(self.cb_category.currentText())
         dialog.exec()

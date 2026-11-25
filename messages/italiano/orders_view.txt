@@ -18,3 +18,11 @@ confirm-delete-category-description: Vuoi eliminare la categoria in uso? Oltre a
 no-categories-warning: Non esistono categorie! Creane una con il pulsante "NUOVA CATEGORIA"
 new-product: Nuovo prodotto
 create-modify-product: Crea o modifica prodotto
+create-modify-product-category: Stai creando o modificando un prodotto nella categoria
+product-name-description: Inserisci un nome per il prodotto
+product-name: Prodotto
+product-price-description: Inserisci il prezzo unitario del prodotto
+product-price: Prezzo
+product-additions: Crea un aggiunta per il prodotto (massimo 10 per prodotto)
+new-addition: Nuova aggiunta
+addition: Aggiunta

@@ -3,7 +3,8 @@
 # ----------------- COMPONENTS -----------------
 # **********************************************
 
-from PySide6.QtWidgets import QLabel, QPushButton, QSizePolicy, QLineEdit, QTextEdit, QFrame, QComboBox, QDialog, QVBoxLayout, QHBoxLayout
+from PySide6.QtWidgets import (QLabel, QPushButton, QSizePolicy, QLineEdit, QTextEdit, QFrame, QComboBox, QTableWidget,
+                                QDialog, QVBoxLayout, QHBoxLayout)
 from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtGui import QMouseEvent
 
@@ -48,6 +49,13 @@ class ExpandedFrame(QFrame):
         if event.button() == Qt.MouseButton.LeftButton: # LeftButton
             self.clicked.emit()
         super().mousePressEvent(event)
+
+class ExpandedTableWidget(QTableWidget):
+    def __init__(self, rows:int=0, columns:int=0, parent=None):
+        super().__init__(rows, columns, parent)
+
+        # Enable expand to occupy all the space
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
 class NonScrollingComboBox(QComboBox):
     def __init__(self, parent=None):

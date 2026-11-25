@@ -18,3 +18,11 @@ confirm-delete-category-description: Do you want to delete the category you are 
 no-categories-warning: No categories exist! Create one with "NEW CATEGORY" button
 new-product: New product
 create-modify-product: Create or modify product
+create-modify-product-category: You are creating or editing a product in the category
+product-name-description: Insert a name for the product
+product-name: Product
+product-price-description: Insert product unit price
+product-price: Price
+product-additions: Create additions for product (max 10 for each product)
+new-addition: New addition
+addition: Addition
