@@ -3,9 +3,10 @@
 # ---------------- ORDERS VIEW -----------------
 # **********************************************
 
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QLabel, QLineEdit, QPushButton, QDialog, QMessageBox, QHeaderView
+from PySide6.QtWidgets import (QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QLabel, QLineEdit, QPushButton, QDialog, QMessageBox, QHeaderView, QTableWidgetItem,
+                                QAbstractItemView, QMenu)
 from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import Qt, QTimer, Signal, QPoint
 import os
 
 # Base window import
@@ -32,6 +33,9 @@ class CreateModifyProduct(BaseDialog):
 
     def __init__(self, category:str, product_data:dict={}, parent=None):
         super().__init__(title=session.get("msg")["orders_view"]["create-modify-product"])
+
+        # Define max additions
+        self.max_additions = 10
 
         # Set main layout
         self.lay = self.content_layout
@@ -75,6 +79,7 @@ class CreateModifyProduct(BaseDialog):
 
         b_new_addition = QPushButton(session.get("msg")["orders_view"]["new-addition"])
         b_new_addition.setAccessibleName("b_main")
+        b_new_addition.clicked.connect(self.add_addition_row)
         self.lay.addWidget(b_new_addition, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.product_additions_table = ExpandedTableWidget(0, 2)
@@ -83,9 +88,62 @@ class CreateModifyProduct(BaseDialog):
             session.get("msg")["orders_view"]["product-price"]
         ])
         self.product_additions_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.product_additions_table.setEditTriggers(
+            QAbstractItemView.EditTrigger.CurrentChanged
+            | QAbstractItemView.EditTrigger.DoubleClicked
+            | QAbstractItemView.EditTrigger.AnyKeyPressed
+        )
+        self.product_additions_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.product_additions_table.customContextMenuRequested.connect(self._show_addition_context_menu)
+        self.product_additions_table.verticalHeader().setVisible(False)
         self.lay.addWidget(self.product_additions_table)
+        self._update_additions_table_height()
 
         self.lay.addStretch() # Push widgets up
+
+    def _update_additions_table_height(self):
+        header_h = self.product_additions_table.horizontalHeader().height() or 32
+        rows = self.product_additions_table.rowCount()
+        row_h = self.product_additions_table.verticalHeader().defaultSectionSize() or 32
+        visible = max(2, rows)
+        total_height = header_h + (visible * row_h) + 8
+        self.product_additions_table.setMinimumHeight(total_height)
+
+    def add_addition_row(self, addition:str="", price:float=0.0):
+        row = self.product_additions_table.rowCount()
+        if row >= self.max_additions:
+            error_msg = QMessageBox(self)
+            error_msg.setWindowTitle(session.get("msg")["errors"]["warning"])
+            error_msg.setText(session.get("msg")["orders_view"]["max-additions-reached-warning"])
+            error_msg.exec()
+            return
+        self.product_additions_table.insertRow(row)
+
+        item_addition = QTableWidgetItem(addition)
+        price_addition = QTableWidgetItem(f"{price:.2f}")
+
+        self.product_additions_table.setItem(row, 0, item_addition)
+        self.product_additions_table.setItem(row, 1, price_addition)
+
+        self._update_additions_table_height()
+
+    def _show_addition_context_menu(self, pos: QPoint):
+        index = self.product_additions_table.indexAt(pos)
+        row = index.row()
+        if row < 0:
+            return
+
+        context_menu = QMenu(self.product_additions_table)
+        delete_action = context_menu.addAction(session.get("msg")["main_messages"]["delete"])
+
+        chosen_action = context_menu.exec(self.product_additions_table.viewport().mapToGlobal(pos))
+        if chosen_action == delete_action:
+            self._remove_addition_row(row)
+
+    def _remove_addition_row(self, row:int):
+        if 0 <= row < self.product_additions_table.rowCount():
+            self.product_additions_table.removeRow(row)
+            self._update_additions_table_height()
 
 # ** Main Window **
 class OrdersWindow(BaseWindow):

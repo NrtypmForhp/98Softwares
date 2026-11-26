@@ -7,3 +7,4 @@ settings: Settings
 confirm: Confirm
 cancel: Cancel
 warning: Warning
+delete: Delete

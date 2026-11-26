@@ -26,3 +26,4 @@ product-price: Prezzo
 product-additions: Crea un aggiunta per il prodotto (massimo 10 per prodotto)
 new-addition: Nuova aggiunta
 addition: Aggiunta
+max-additions-reached-warning: Puoi aggiungere un massimo di 10 aggiunte per prodotto!

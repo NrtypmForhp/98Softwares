@@ -23,6 +23,7 @@ product-name-description: Insert a name for the product
 product-name: Product
 product-price-description: Insert product unit price
 product-price: Price
-product-additions: Create additions for product (max 10 for each product)
+product-additions: Create additions for product (max 10 to each product)
 new-addition: New addition
 addition: Addition
+max-additions-reached-warning: You can add a maximum of 10 additions to each product!
