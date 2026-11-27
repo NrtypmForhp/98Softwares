@@ -8,3 +8,4 @@ confirm: Conferma
 cancel: Annulla
 warning: Attenzione
 delete: Elimina
+create-modify: Crea - Modifica

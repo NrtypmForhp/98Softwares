@@ -27,3 +27,7 @@ product-additions: Create additions for product (max 10 to each product)
 new-addition: New addition
 addition: Addition
 max-additions-reached-warning: You can add a maximum of 10 additions to each product!
+product-name-warning: Product name cannot be empty!
+product-price-warning: Product price it's not correct!
+addition-name-warning: Addition description cannot be empty!
+addition-price-warning: Addition price it's not correct!

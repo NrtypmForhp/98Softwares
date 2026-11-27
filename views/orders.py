@@ -82,68 +82,142 @@ class CreateModifyProduct(BaseDialog):
         b_new_addition.clicked.connect(self.add_addition_row)
         self.lay.addWidget(b_new_addition, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.product_additions_table = ExpandedTableWidget(0, 2)
-        self.product_additions_table.setHorizontalHeaderLabels([
+        self.t_product_additions = ExpandedTableWidget(0, 2)
+        self.t_product_additions.setHorizontalHeaderLabels([
             session.get("msg")["orders_view"]["addition"],
             session.get("msg")["orders_view"]["product-price"]
         ])
-        self.product_additions_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        self.product_additions_table.setEditTriggers(
+        self.t_product_additions.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.t_product_additions.setEditTriggers(
             QAbstractItemView.EditTrigger.CurrentChanged
             | QAbstractItemView.EditTrigger.DoubleClicked
             | QAbstractItemView.EditTrigger.AnyKeyPressed
         )
-        self.product_additions_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.product_additions_table.customContextMenuRequested.connect(self._show_addition_context_menu)
-        self.product_additions_table.verticalHeader().setVisible(False)
-        self.lay.addWidget(self.product_additions_table)
+        self.t_product_additions.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.t_product_additions.customContextMenuRequested.connect(self._show_addition_context_menu)
+        self.t_product_additions.verticalHeader().setVisible(False)
+        self.lay.addWidget(self.t_product_additions)
         self._update_additions_table_height()
+
+        self.lay.addSpacing(10)
+
+        b_create_modify_product = QPushButton(session.get("msg")["main_messages"]["create-modify"])
+        b_create_modify_product.setAccessibleName("b_main")
+        b_create_modify_product.clicked.connect(self.create_modify_product)
+        self.lay.addWidget(b_create_modify_product, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.lay.addStretch() # Push widgets up
 
     def _update_additions_table_height(self):
-        header_h = self.product_additions_table.horizontalHeader().height() or 32
-        rows = self.product_additions_table.rowCount()
-        row_h = self.product_additions_table.verticalHeader().defaultSectionSize() or 32
+        header_h = self.t_product_additions.horizontalHeader().height() or 32
+        rows = self.t_product_additions.rowCount()
+        row_h = self.t_product_additions.verticalHeader().defaultSectionSize() or 32
         visible = max(2, rows)
         total_height = header_h + (visible * row_h) + 8
-        self.product_additions_table.setMinimumHeight(total_height)
+        self.t_product_additions.setMinimumHeight(total_height)
 
     def add_addition_row(self, addition:str="", price:float=0.0):
-        row = self.product_additions_table.rowCount()
+        row = self.t_product_additions.rowCount()
         if row >= self.max_additions:
             error_msg = QMessageBox(self)
             error_msg.setWindowTitle(session.get("msg")["errors"]["warning"])
             error_msg.setText(session.get("msg")["orders_view"]["max-additions-reached-warning"])
             error_msg.exec()
             return
-        self.product_additions_table.insertRow(row)
+        self.t_product_additions.insertRow(row)
 
         item_addition = QTableWidgetItem(addition)
         price_addition = QTableWidgetItem(f"{price:.2f}")
 
-        self.product_additions_table.setItem(row, 0, item_addition)
-        self.product_additions_table.setItem(row, 1, price_addition)
+        self.t_product_additions.setItem(row, 0, item_addition)
+        self.t_product_additions.setItem(row, 1, price_addition)
 
         self._update_additions_table_height()
 
     def _show_addition_context_menu(self, pos: QPoint):
-        index = self.product_additions_table.indexAt(pos)
+        index = self.t_product_additions.indexAt(pos)
         row = index.row()
         if row < 0:
             return
 
-        context_menu = QMenu(self.product_additions_table)
+        context_menu = QMenu(self.t_product_additions)
         delete_action = context_menu.addAction(session.get("msg")["main_messages"]["delete"])
 
-        chosen_action = context_menu.exec(self.product_additions_table.viewport().mapToGlobal(pos))
+        chosen_action = context_menu.exec(self.t_product_additions.viewport().mapToGlobal(pos))
         if chosen_action == delete_action:
             self._remove_addition_row(row)
 
     def _remove_addition_row(self, row:int):
-        if 0 <= row < self.product_additions_table.rowCount():
-            self.product_additions_table.removeRow(row)
+        if 0 <= row < self.t_product_additions.rowCount():
+            self.t_product_additions.removeRow(row)
             self._update_additions_table_height()
+
+    def create_modify_product(self):
+        # Get product name and price
+        product_name = self.le_product_name.text().upper().strip()
+        product_price = self.le_product_price.text().replace(" ", "").replace(",", ".")
+
+        # Check name and price
+        if not product_name:
+            error_msg = QMessageBox(self)
+            error_msg.setWindowTitle(session.get("msg")["errors"]["warning"])
+            error_msg.setText(session.get("msg")["orders_view"]["product-name-warning"])
+            error_msg.exec()
+            return
+
+        if not product_price:
+            error_msg = QMessageBox(self)
+            error_msg.setWindowTitle(session.get("msg")["errors"]["warning"])
+            error_msg.setText(session.get("msg")["orders_view"]["product-price-warning"])
+            error_msg.exec()
+            return
+        try:
+            product_price_float = round(float(product_price), 2)
+        except ValueError:
+            error_msg = QMessageBox(self)
+            error_msg.setWindowTitle(session.get("msg")["errors"]["warning"])
+            error_msg.setText(session.get("msg")["orders_view"]["product-price-warning"])
+            error_msg.exec()
+            return
+
+        # Get and check additions
+        additions = []
+
+        if self.t_product_additions.rowCount() > 0:
+            for row in range(self.t_product_additions.rowCount()):
+                addition_item = self.t_product_additions.item(row, 0)
+                price_item = self.t_product_additions.item(row, 1)
+
+                addition = addition_item.text().upper().strip() if addition_item is not None else ""
+                price = price_item.text().replace(" ", "").replace(",", ".") if price_item is not None else ""
+
+                if not addition:
+                    error_msg = QMessageBox(self)
+                    error_msg.setWindowTitle(session.get("msg")["errors"]["warning"])
+                    error_msg.setText(session.get("msg")["orders_view"]["addition-name-warning"])
+                    error_msg.exec()
+                    return
+                if not price:
+                    error_msg = QMessageBox(self)
+                    error_msg.setWindowTitle(session.get("msg")["errors"]["warning"])
+                    error_msg.setText(session.get("msg")["orders_view"]["addition-price-warning"])
+                    error_msg.exec()
+                    return
+                try:
+                    price_float = round(float(price), 2)
+                except ValueError:
+                    error_msg = QMessageBox(self)
+                    error_msg.setWindowTitle(session.get("msg")["errors"]["warning"])
+                    error_msg.setText(session.get("msg")["orders_view"]["addition-price-warning"])
+                    error_msg.exec()
+                    return
+
+                additions.append({
+                    "addition": addition,
+                    "price": price_float
+                })
+
+        print(additions)
 
 # ** Main Window **
 class OrdersWindow(BaseWindow):
